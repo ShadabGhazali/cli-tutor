@@ -2,6 +2,12 @@
 name = "cli-tutor"
 version = "0.1.0"
 edition = "2021"
+description = "Interactive terminal app for learning Unix command-line tools"
+license = "MIT"
+repository = "https://github.com/ShadabGhazali/cli-tutor"
+keywords = ["cli", "tui", "terminal", "learning", "unix"]
+categories = ["command-line-utilities"]
+exclude = ["features/", "content/modules.toml"]
 
 [lib]
 name = "cli_tutor"
