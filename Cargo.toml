@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/ShadabGhazali/cli-tutor"
 keywords = ["cli", "tui", "terminal", "learning", "unix"]
 categories = ["command-line-utilities"]
-exclude = ["features/", "content/modules.toml"]
+exclude = ["features/"]
 
 [lib]
 name = "cli_tutor"
