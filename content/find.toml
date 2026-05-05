@@ -1,0 +1,268 @@
+[module]
+name = "find"
+description = "Search for files in a directory hierarchy"
+version = 1
+
+[intro]
+text = """
+## What is find?
+
+`find` searches for files and directories in a directory tree based on criteria like name, type, size, or modification time.
+
+## Basic Syntax
+
+```
+find [path] [expression]
+```
+
+## Common Predicates
+
+- `-name 'pattern'` — match filename (glob)
+- `-iname 'pattern'` — case-insensitive name match
+- `-type f` — regular files; `-type d` — directories
+- `-mtime -N` — modified in the last N days
+- `-size +Nk` — larger than N kilobytes
+- `-exec cmd {} \\;` — run a command on each result
+- `-print0` — null-separated output (for use with xargs -0)
+
+## Combining Predicates
+
+- `-a` (and) is implicit between predicates
+- `-o` — logical or
+- `!` or `-not` — negate
+"""
+
+[[examples]]
+title = "Find files by name"
+description = "Find all .txt files in the current directory tree"
+command = "find . -name '*.txt'"
+output = "./notes.txt\n./data/items.txt\n"
+
+[[examples]]
+title = "Find only directories"
+description = "List all subdirectories"
+command = "find . -type d"
+output = ".\n./data\n./logs\n"
+
+[[examples]]
+title = "Find and execute"
+description = "Print the size of every .log file"
+command = "find . -name '*.log' -exec wc -l {} \\;"
+output = "      5 ./app.log\n      3 ./error.log\n"
+
+[[exercises]]
+id = "find.1"
+difficulty = "beginner"
+question = """Find all files with the `.txt` extension in the current directory tree.
+Print one path per line."""
+expected_output = "./notes.txt\n./subdir/readme.txt\n"
+hints = [
+  "Use -name with a glob pattern",
+  "Try: find . -name '*.txt'",
+]
+solution = "find . -name '*.txt'"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "notes.txt"
+content = "some notes\n"
+
+[[exercises.fixtures]]
+filename = "subdir/readme.txt"
+content = "readme\n"
+
+[[exercises.fixtures]]
+filename = "subdir/data.csv"
+content = "a,b,c\n"
+
+[[exercises]]
+id = "find.2"
+difficulty = "beginner"
+question = """Find only directories (not files) in the current tree."""
+expected_output = ".\n./subdir\n"
+hints = [
+  "Use -type d to match directories",
+  "Try: find . -type d",
+]
+solution = "find . -type d"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "file.txt"
+content = "hello\n"
+
+[[exercises.fixtures]]
+filename = "subdir/file2.txt"
+content = "world\n"
+
+[[exercises]]
+id = "find.3"
+difficulty = "beginner"
+question = """Find all regular files (not directories) directly inside the current directory (not recursing into subdirectories).
+Hint: use `-maxdepth 1`."""
+expected_output = "./a.txt\n./b.txt\n"
+hints = [
+  "Use -maxdepth 1 to limit depth and -type f for files",
+  "Try: find . -maxdepth 1 -type f",
+]
+solution = "find . -maxdepth 1 -type f"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "a.txt"
+content = "a\n"
+
+[[exercises.fixtures]]
+filename = "b.txt"
+content = "b\n"
+
+[[exercises.fixtures]]
+filename = "sub/c.txt"
+content = "c\n"
+
+[[exercises]]
+id = "find.4"
+difficulty = "intermediate"
+question = """Find all files whose names end in `.log` and print their paths."""
+expected_output = "./app.log\n./errors/system.log\n"
+hints = [
+  "Use -name '*.log' with find",
+  "Try: find . -name '*.log'",
+]
+solution = "find . -name '*.log'"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "app.log"
+content = "log entry\n"
+
+[[exercises.fixtures]]
+filename = "errors/system.log"
+content = "system error\n"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "data\n"
+
+[[exercises]]
+id = "find.5"
+difficulty = "intermediate"
+question = """Find all `.txt` files and print the count of lines in each using `wc -l`.
+Files: notes.txt (3 lines), readme.txt (2 lines)."""
+expected_output = "3 ./notes.txt\n2 ./sub/readme.txt\n"
+hints = [
+  "Use -exec wc -l {} \\; with find",
+  "Try: find . -name '*.txt' -exec wc -l {} \\;",
+]
+solution = "find . -name '*.txt' -exec wc -l {} \\;"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "notes.txt"
+content = "line one\nline two\nline three\n"
+
+[[exercises.fixtures]]
+filename = "sub/readme.txt"
+content = "first\nsecond\n"
+
+[[exercises]]
+id = "find.6"
+difficulty = "intermediate"
+question = """Find all files that are either `.txt` or `.md`."""
+expected_output = "./README.md\n./notes.txt\n./docs/guide.md\n"
+hints = [
+  "Use -name '*.txt' -o -name '*.md' to combine with OR",
+  "Try: find . \\( -name '*.txt' -o -name '*.md' \\)",
+]
+solution = "find . \\( -name '*.txt' -o -name '*.md' \\)"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "README.md"
+content = "readme\n"
+
+[[exercises.fixtures]]
+filename = "notes.txt"
+content = "notes\n"
+
+[[exercises.fixtures]]
+filename = "docs/guide.md"
+content = "guide\n"
+
+[[exercises.fixtures]]
+filename = "data.csv"
+content = "data\n"
+
+[[exercises]]
+id = "find.7"
+difficulty = "advanced"
+question = """Find all `.sh` files and make them executable using chmod.
+Then list all files with execute permission using find -perm."""
+expected_output = "./run.sh\n./deploy.sh\n"
+hints = [
+  "First: find . -name '*.sh' -exec chmod +x {} \\;",
+  "Then: find . -perm /u+x -name '*.sh'",
+  "Try combining both: find . -name '*.sh' -exec chmod +x {} \\; && find . -perm /u+x -name '*.sh'",
+]
+solution = "find . -name '*.sh' -exec chmod +x {} \\; && find . -perm /u+x -name '*.sh'"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "run.sh"
+content = "#!/bin/sh\necho hello\n"
+
+[[exercises.fixtures]]
+filename = "deploy.sh"
+content = "#!/bin/sh\necho deploy\n"
+
+[[exercises.fixtures]]
+filename = "notes.txt"
+content = "notes\n"
+
+[[exercises]]
+id = "find.8"
+difficulty = "advanced"
+question = """Find all empty files (zero bytes) in the current tree."""
+expected_output = "./empty.txt\n./sub/blank.log\n"
+hints = [
+  "Use -empty predicate",
+  "Try: find . -type f -empty",
+]
+solution = "find . -type f -empty"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "empty.txt"
+content = ""
+
+[[exercises.fixtures]]
+filename = "sub/blank.log"
+content = ""
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "has content\n"
+
+[[exercises]]
+id = "find.9"
+difficulty = "advanced"
+question = """Find all files whose names do NOT end in `.txt`."""
+expected_output = "./script.sh\n./data.csv\n"
+hints = [
+  "Use ! to negate a predicate",
+  "Try: find . -type f ! -name '*.txt'",
+]
+solution = "find . -type f ! -name '*.txt'"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "notes.txt"
+content = "notes\n"
+
+[[exercises.fixtures]]
+filename = "script.sh"
+content = "#!/bin/sh\n"
+
+[[exercises.fixtures]]
+filename = "data.csv"
+content = "a,b\n"

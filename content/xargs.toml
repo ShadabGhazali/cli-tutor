@@ -1,0 +1,154 @@
+[module]
+name = "xargs"
+description = "Build and execute command lines from standard input"
+version = 1
+
+[intro]
+text = """
+## What is xargs?
+
+`xargs` reads items from standard input and executes a command with those items as arguments. It's the glue that connects the output of one command to the arguments of another.
+
+## Basic Syntax
+
+```
+command | xargs [OPTIONS] [command]
+```
+
+## Common Options
+
+- `-I {}` — replace `{}` with each input item
+- `-0` — input items are null-terminated (pairs with `find -print0`)
+- `-n N` — use at most N arguments per command invocation
+- `-P N` — run up to N processes in parallel
+- `-t` — print each command before executing it
+
+## When to Use xargs
+
+- `find . -name '*.log' | xargs rm` — delete found files
+- `cat urls.txt | xargs curl -O` — download multiple URLs
+- `find . -name '*.rs' | xargs grep 'TODO'` — search in found files
+"""
+
+[[examples]]
+title = "Basic piping"
+description = "Echo each word from a file as a separate argument"
+command = "cat words.txt | xargs echo"
+output = "apple banana cherry\n"
+
+[[examples]]
+title = "One argument at a time"
+description = "Process each item individually with -n 1"
+command = "cat words.txt | xargs -n 1 echo"
+output = "apple\nbanana\ncherry\n"
+
+[[examples]]
+title = "Placeholder substitution"
+description = "Use -I to place each item in a specific spot in the command"
+command = "cat names.txt | xargs -I {} echo 'Hello, {}!'"
+output = "Hello, Alice!\nHello, Bob!\n"
+
+[[exercises]]
+id = "xargs.1"
+difficulty = "beginner"
+question = """The file `files.txt` lists filenames, one per line.
+Use xargs to pass them all to `echo` as a single invocation."""
+expected_output = "a.txt b.txt c.txt\n"
+hints = [
+  "Pipe cat files.txt into xargs echo",
+  "Try: cat files.txt | xargs echo",
+]
+solution = "cat files.txt | xargs echo"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "files.txt"
+content = "a.txt\nb.txt\nc.txt\n"
+
+[[exercises]]
+id = "xargs.2"
+difficulty = "beginner"
+question = """The file `names.txt` has one name per line.
+Use xargs to echo each name on its own line (one argument per invocation)."""
+expected_output = "Alice\nBob\nCharlie\n"
+hints = [
+  "Use -n 1 to pass one argument at a time",
+  "Try: cat names.txt | xargs -n 1 echo",
+]
+solution = "cat names.txt | xargs -n 1 echo"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "names.txt"
+content = "Alice\nBob\nCharlie\n"
+
+[[exercises]]
+id = "xargs.3"
+difficulty = "intermediate"
+question = """The file `names.txt` has one name per line.
+Use xargs with -I to print 'Hello, NAME!' for each name."""
+expected_output = "Hello, Alice!\nHello, Bob!\nHello, Charlie!\n"
+hints = [
+  "Use -I {} to define a placeholder",
+  "Try: cat names.txt | xargs -I {} echo 'Hello, {}!'",
+]
+solution = "cat names.txt | xargs -I {} echo 'Hello, {}!'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "names.txt"
+content = "Alice\nBob\nCharlie\n"
+
+[[exercises]]
+id = "xargs.4"
+difficulty = "intermediate"
+question = """Use find to locate all `.txt` files in the current tree, then use xargs to count the total lines across all of them with `wc -l`."""
+expected_output = "5\n"
+hints = [
+  "Pipe find output into xargs wc -l, then use tail or grep for the total",
+  "Try: find . -name '*.txt' | xargs wc -l | tail -1 | awk '{print $1}'",
+]
+solution = "find . -name '*.txt' | xargs wc -l | tail -1 | awk '{print $1}'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "a.txt"
+content = "one\ntwo\nthree\n"
+
+[[exercises.fixtures]]
+filename = "b.txt"
+content = "four\nfive\n"
+
+[[exercises]]
+id = "xargs.5"
+difficulty = "advanced"
+question = """The file `targets.txt` lists directory names to create.
+Use xargs to create all of them with mkdir."""
+expected_output = "dir_a\ndir_b\ndir_c\n"
+hints = [
+  "Use xargs mkdir to create directories from the list",
+  "Then use ls to verify: cat targets.txt | xargs mkdir && ls",
+]
+solution = "cat targets.txt | xargs mkdir && ls"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "targets.txt"
+content = "dir_a\ndir_b\ndir_c\n"
+
+[[exercises]]
+id = "xargs.6"
+difficulty = "advanced"
+question = """The file `paths.txt` has file paths with spaces in them.
+Use null-delimited xargs (-0) after tr to handle the spaces safely, then echo each path."""
+expected_output = "file one.txt\nfile two.txt\n"
+hints = [
+  "Use tr '\\n' '\\0' to convert newlines to null bytes, then xargs -0",
+  "Try: cat paths.txt | tr '\\n' '\\0' | xargs -0 -n 1 echo",
+]
+solution = "cat paths.txt | tr '\\n' '\\0' | xargs -0 -n 1 echo"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "paths.txt"
+content = "file one.txt\nfile two.txt\n"

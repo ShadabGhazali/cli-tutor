@@ -1,0 +1,109 @@
+[module]
+name = "uniq"
+description = "Report or omit repeated lines"
+version = 1
+
+[intro]
+text = """
+## What is uniq?
+
+`uniq` filters adjacent matching lines. Since it only compares adjacent lines, input is usually sorted first.
+
+## Basic Syntax
+
+```
+sort file | uniq [OPTIONS]
+```
+
+## Common Options
+
+- `-c` — prefix each line with its count
+- `-d` — print only duplicate lines (lines that appear more than once)
+- `-u` — print only unique lines (lines that appear exactly once)
+- `-i` — case-insensitive comparison
+
+## Typical Pipeline
+
+`sort file.txt | uniq` — deduplicate
+`sort file.txt | uniq -c | sort -rn` — frequency count, most common first
+"""
+
+[[examples]]
+title = "Remove duplicates"
+description = "Remove consecutive duplicate lines (sort first!)"
+command = "sort words.txt | uniq"
+output = "apple\nbanana\ncherry\n"
+
+[[examples]]
+title = "Count occurrences"
+description = "Show how many times each line appears"
+command = "sort words.txt | uniq -c"
+output = "      1 apple\n      2 banana\n      1 cherry\n"
+
+[[exercises]]
+id = "uniq.1"
+difficulty = "beginner"
+question = """The file `words.txt` has words, some repeated.
+Sort and deduplicate them."""
+expected_output = "apple\nbanana\ncherry\n"
+hints = [
+  "Sort first, then pipe to uniq",
+  "Try: sort words.txt | uniq",
+]
+solution = "sort words.txt | uniq"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "banana\napple\ncherry\nbanana\napple\n"
+
+[[exercises]]
+id = "uniq.2"
+difficulty = "beginner"
+question = """The file `words.txt` has words, some repeated.
+Count how many times each word appears (sort by word first)."""
+expected_output = "      2 apple\n      1 banana\n      3 cherry\n"
+hints = [
+  "Use uniq -c after sorting",
+  "Try: sort words.txt | uniq -c",
+]
+solution = "sort words.txt | uniq -c"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "apple\ncherry\nbanana\napple\ncherry\ncherry\n"
+
+[[exercises]]
+id = "uniq.3"
+difficulty = "intermediate"
+question = """The file `words.txt` has words.
+Print only words that appear more than once."""
+expected_output = "apple\ncherry\n"
+hints = [
+  "Use uniq -d to show only duplicated lines",
+  "Try: sort words.txt | uniq -d",
+]
+solution = "sort words.txt | uniq -d"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "apple\ncherry\nbanana\napple\ncherry\n"
+
+[[exercises]]
+id = "uniq.4"
+difficulty = "advanced"
+question = """The file `words.txt` has words.
+Print a frequency table sorted by count descending (most common first), in the format 'N word'."""
+expected_output = "3 cherry\n2 apple\n1 banana\n"
+hints = [
+  "Chain: sort | uniq -c | sort -rn | awk to reformat",
+  "Try: sort words.txt | uniq -c | sort -rn | awk '{print $1, $2}'",
+]
+solution = "sort words.txt | uniq -c | sort -rn | awk '{print $1, $2}'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "apple\ncherry\nbanana\napple\ncherry\ncherry\n"

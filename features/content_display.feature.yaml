@@ -1,0 +1,71 @@
+feature:
+  name: content_display
+  product: cli-tutor
+  description: >
+    Rendering of the three content views (Intro, Examples, Exercise) inside the
+    right content pane. Covers layout, text styling, syntax highlighting for
+    commands, and minimum terminal size enforcement.
+
+components:
+  LAYOUT:
+    name: Root Layout
+    description: Top-level split between module list and content pane
+    requirements:
+      1: The terminal is split vertically — left panel 25% width, right content pane 75% width
+      2: A header bar spans the full width showing app name, current module name, and exercise progress
+      3: A footer bar spans the full width showing context-sensitive keybinding hints
+      4: If terminal width < 80 or height < 24, all normal content is hidden and a "Please resize your terminal (min 80×24)" message is displayed centered
+      5: The layout reflows correctly on terminal resize events (crossterm Resize event)
+
+  INTRO_VIEW:
+    name: Intro View
+    description: Displays the command overview text
+    requirements:
+      1: Intro text is rendered in a scrollable paragraph widget occupying the full content pane
+      2: Inline code spans (text wrapped in backticks in the TOML) are rendered with a distinct highlight style
+      3: Section headings (lines starting with `##` in the TOML intro text) are rendered bold and underlined
+      4: The view title "Introduction" is shown in the content pane's tab header
+
+  EXAMPLES_VIEW:
+    name: Examples View
+    description: Displays worked examples with commands and their output
+    requirements:
+      1: Each example is rendered as a titled block with description, command, and output sections
+      2: The command line is rendered with a distinct background color to visually separate it from description text
+      3: The command is prefixed with "$ " in the display (not stored in TOML)
+      4: Example output is rendered in a monospace block, visually distinct from prose
+      5: Multiple examples are separated by a blank line / divider
+      6: The examples list is scrollable as a whole (not per-example)
+      7: Total example count is shown in the tab header (e.g. "Examples (5)")
+
+  EXERCISE_VIEW:
+    name: Exercise View
+    description: The interactive exercise pane
+    requirements:
+      1: Question text occupies the top section of the content pane (scrollable if long)
+      2: If the exercise has fixtures, a collapsible "Files" section shows filename and first 20 lines of each fixture
+      2-note: Files section is collapsed by default; pressing `f` toggles it
+      3: The input bar (see text_input feature) is rendered below the question
+      4: The output panel occupies the bottom ~40% of the content pane and shows the result of the last submission
+      5: Output panel is scrollable independently of the question text
+      6: Difficulty badge (Beginner / Intermediate / Advanced) is shown next to the exercise number with color coding (green / yellow / red)
+      7: Hint text appears in a dedicated styled block between the question and input bar when hints have been revealed
+
+  STYLING:
+    name: Visual Styling
+    description: Colors and styles (must work in both dark and light terminal themes)
+    requirements:
+      1: All colors are specified using Ratatui named colors (Color::Green, Color::Yellow, etc.) — no hardcoded RGB values
+      2: Correct feedback uses green; wrong feedback uses red; errors/warnings use yellow; hints use cyan
+      3: The selected module in the left panel uses a reversed-color highlight (bg/fg swapped)
+      4: Command text in examples uses bold styling
+      5: The app must be usable in both dark and light terminal backgrounds without a theme toggle
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: All rendering code lives in src/ui/ — zero rendering logic in app.rs
+      2: Each view (intro, examples, exercise) is a separate function in its own file under src/ui/
+      3: Rendering functions accept `&App` (or relevant sub-slices) and a `&mut Frame` — no return values
+      4: Word-wrap for long lines is handled by Ratatui's Paragraph widget with Wrap enabled — do not implement manual wrapping

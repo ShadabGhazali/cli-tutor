@@ -1,0 +1,124 @@
+[module]
+name = "tr"
+description = "Translate or delete characters"
+version = 1
+
+[intro]
+text = """
+## What is tr?
+
+`tr` translates, squeezes, or deletes characters from standard input. It always reads from stdin and writes to stdout.
+
+## Basic Syntax
+
+```
+tr [OPTIONS] SET1 [SET2]
+```
+
+## Common Options
+
+- `-d SET` — delete characters in SET
+- `-s SET` — squeeze repeated characters in SET to a single character
+- No option — translate characters in SET1 to corresponding chars in SET2
+
+## Character Sets
+
+- `a-z` — lowercase letters
+- `A-Z` — uppercase letters
+- `0-9` — digits
+- `[:alpha:]` — all letters
+- `[:digit:]` — all digits
+- `\\n` — newline
+- `\\t` — tab
+
+## Examples
+
+`echo hello | tr a-z A-Z` — uppercase
+`echo hello | tr -d aeiou` — remove vowels
+`echo "a  b   c" | tr -s ' '` — squeeze spaces
+"""
+
+[[examples]]
+title = "Uppercase conversion"
+description = "Convert all lowercase to uppercase"
+command = "echo 'hello world' | tr a-z A-Z"
+output = "HELLO WORLD\n"
+
+[[examples]]
+title = "Delete characters"
+description = "Remove all vowels from input"
+command = "echo 'hello world' | tr -d aeiou"
+output = "hll wrld\n"
+
+[[examples]]
+title = "Squeeze spaces"
+description = "Collapse multiple spaces into one"
+command = "echo 'a  b   c' | tr -s ' '"
+output = "a b c\n"
+
+[[exercises]]
+id = "tr.1"
+difficulty = "beginner"
+question = """Convert the text in `text.txt` to all uppercase."""
+expected_output = "HELLO WORLD\n"
+hints = [
+  "Use tr with lowercase to uppercase range",
+  "Try: cat text.txt | tr a-z A-Z",
+]
+solution = "cat text.txt | tr a-z A-Z"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "text.txt"
+content = "hello world\n"
+
+[[exercises]]
+id = "tr.2"
+difficulty = "beginner"
+question = """The file `text.txt` has text with vowels.
+Remove all vowels (a, e, i, o, u — both upper and lower case)."""
+expected_output = "Hll Wrld\n"
+hints = [
+  "Use tr -d with the set of vowels",
+  "Try: cat text.txt | tr -d aeiouAEIOU",
+]
+solution = "cat text.txt | tr -d aeiouAEIOU"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "text.txt"
+content = "Hello World\n"
+
+[[exercises]]
+id = "tr.3"
+difficulty = "intermediate"
+question = """The file `text.txt` has words separated by multiple spaces.
+Squeeze all consecutive spaces into a single space."""
+expected_output = "one two three four\n"
+hints = [
+  "Use tr -s ' ' to squeeze spaces",
+  "Try: cat text.txt | tr -s ' '",
+]
+solution = "cat text.txt | tr -s ' '"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "text.txt"
+content = "one  two   three    four\n"
+
+[[exercises]]
+id = "tr.4"
+difficulty = "advanced"
+question = """The file `text.txt` has a comma-separated line.
+Replace all commas with newlines to put each value on its own line."""
+expected_output = "apple\nbanana\ncherry\n"
+hints = [
+  "Use tr to translate ',' to newline '\\n'",
+  "Try: cat text.txt | tr ',' '\\n'",
+]
+solution = "cat text.txt | tr ',' '\\n'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "text.txt"
+content = "apple,banana,cherry\n"

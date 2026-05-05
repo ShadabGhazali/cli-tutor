@@ -1,0 +1,66 @@
+feature:
+  name: exercise_runner
+  product: cli-tutor
+  description: >
+    The core learning loop. Executes the user's shell command in a sandboxed
+    temp directory, compares stdout against the expected output, and updates
+    exercise state (correct / wrong / hint level).
+
+components:
+  EXECUTION:
+    name: Command Execution
+    description: Subprocess sandboxing and output capture
+    requirements:
+      1: User command is executed via `sh -c "<user_input>"` — never directly exec'd
+      2: Working directory of the subprocess is set to the exercise's fixture temp dir
+      3: Fixture files are written to the temp dir before each execution
+      3-note: Fixtures are re-written on every submission to prevent state bleed between attempts
+      4: stdout and stderr are captured separately as UTF-8 strings
+      5: Execution is subject to a hard 3-second wall-clock timeout
+      6: If the timeout is exceeded, execution is terminated and the user sees "Command timed out (3s)"
+      7: Subprocess environment is minimal — PATH is preserved; HOME, USER, TERM are set; all other vars are stripped
+      8: The temp directory is created once per session (not per submission) and reused
+
+  MATCHING:
+    name: Output Matching
+    description: Comparison of captured stdout against expected output
+    requirements:
+      1: Supports four match modes — exact, normalized, sorted, regex — as defined in the exercise TOML
+      2: exact mode — captured stdout must be byte-for-byte identical to expected_output
+      3: normalized mode — trailing whitespace is stripped from each line; trailing blank lines are removed; then compared
+      4: sorted mode — both actual and expected lines are sorted lexicographically before comparison
+      5: regex mode — expected_output is treated as a Rust regex; the entire captured stdout must match
+      6: Match result is a typed enum (Correct / Wrong / Error(String)) — not a boolean
+      6-note: Error variant holds a human-readable description (timeout, command not found, etc.)
+
+  FEEDBACK:
+    name: User Feedback
+    description: Visual response after a submission
+    requirements:
+      1: On Correct — the output panel shows a green "✓ Correct!" banner above the command output
+      2: On Wrong — the output panel shows a red "✗ Wrong output" banner; both actual and expected output are displayed for comparison
+      3: On Error — the output panel shows a yellow "⚠ Error" banner with the error description and the captured stderr
+      4: The feedback state persists until the user submits a new command or navigates away
+      5: Previous attempt count is shown (e.g. "Attempt 3") so the user can gauge effort
+
+  HINTS:
+    name: Progressive Hints
+    description: Hint revelation system
+    requirements:
+      1: Pressing `h` reveals the next hint in the exercise's hints list (one at a time)
+      2: Hints are shown in a dedicated panel below the question text
+      3: Once all hints are exhausted, pressing `h` shows "No more hints"
+      4: Pressing `s` reveals the full reference solution
+      5: Revealing the solution marks the exercise as "solved with solution" — distinct from "solved unaided" in progress tracking
+      6: Hint/solution state resets when navigating to a different exercise
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Command execution runs on a background thread; the UI event loop must not block during execution
+      1-note: Use std::sync::mpsc channel to send the result back to the main thread
+      2: No async runtime (tokio, async-std) is used — thread + channel is sufficient
+      3: Temp directory cleanup happens on app exit (Drop impl or explicit cleanup in main)
+      4: executor.rs exposes a single public function `execute(command: &str, fixtures: &[Fixture], timeout: Duration) -> ExecResult`
+      5: matcher.rs exposes a single public function `matches(actual: &str, expected: &str, mode: MatchMode) -> bool`

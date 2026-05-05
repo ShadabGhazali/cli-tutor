@@ -1,0 +1,148 @@
+[module]
+name = "sort"
+description = "Sort lines of text files"
+version = 1
+
+[intro]
+text = """
+## What is sort?
+
+`sort` sorts lines of text files. By default it sorts lexicographically (alphabetically). Use flags to sort numerically, reverse, or by specific fields.
+
+## Basic Syntax
+
+```
+sort [OPTIONS] [file]
+```
+
+## Common Options
+
+- `-n` — sort numerically
+- `-r` — reverse order
+- `-k N` — sort by field N (default field separator: whitespace)
+- `-t CHAR` — use CHAR as field separator
+- `-u` — unique (remove duplicate lines)
+- `-s` — stable sort (preserve original order for equal keys)
+
+## Examples
+
+`sort file.txt` — alphabetical sort
+`sort -n numbers.txt` — numeric sort
+`sort -rn numbers.txt` — reverse numeric
+`sort -k2 data.txt` — sort by second field
+`sort -t, -k2 data.csv` — sort CSV by second column
+"""
+
+[[examples]]
+title = "Alphabetical sort"
+description = "Sort words alphabetically"
+command = "sort words.txt"
+output = "apple\nbanana\ncherry\n"
+
+[[examples]]
+title = "Numeric sort"
+description = "Sort numbers correctly (not lexicographically)"
+command = "sort -n numbers.txt"
+output = "1\n5\n10\n20\n100\n"
+
+[[exercises]]
+id = "sort.1"
+difficulty = "beginner"
+question = """The file `words.txt` has words in random order.
+Sort them alphabetically."""
+expected_output = "apple\nbanana\ncherry\ndate\nelderberry\n"
+hints = [
+  "sort with no flags does alphabetical sort",
+  "Try: sort words.txt",
+]
+solution = "sort words.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "cherry\napple\ndate\nbanana\nelderberry\n"
+
+[[exercises]]
+id = "sort.2"
+difficulty = "beginner"
+question = """The file `numbers.txt` has integers.
+Sort them numerically (not lexicographically)."""
+expected_output = "1\n5\n10\n20\n100\n"
+hints = [
+  "Use -n for numeric sort",
+  "Try: sort -n numbers.txt",
+]
+solution = "sort -n numbers.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "numbers.txt"
+content = "20\n100\n1\n10\n5\n"
+
+[[exercises]]
+id = "sort.3"
+difficulty = "beginner"
+question = """The file `words.txt` has words with duplicates.
+Sort alphabetically and remove duplicates."""
+expected_output = "apple\nbanana\ncherry\n"
+hints = [
+  "Use -u flag to remove duplicates",
+  "Try: sort -u words.txt",
+]
+solution = "sort -u words.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "banana\napple\ncherry\napple\nbanana\n"
+
+[[exercises]]
+id = "sort.4"
+difficulty = "intermediate"
+question = """The file `numbers.txt` has integers.
+Sort them in reverse numeric order (largest first)."""
+expected_output = "100\n20\n10\n5\n1\n"
+hints = [
+  "Use -rn for reverse numeric sort",
+  "Try: sort -rn numbers.txt",
+]
+solution = "sort -rn numbers.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "numbers.txt"
+content = "20\n100\n1\n10\n5\n"
+
+[[exercises]]
+id = "sort.5"
+difficulty = "intermediate"
+question = """The file `data.txt` has name and score pairs separated by spaces.
+Sort by the score (second field) numerically."""
+expected_output = "Diana 61\nBob 72\nCharlie 87\nAlice 95\n"
+hints = [
+  "Use -k2 to sort by second field, -n for numeric",
+  "Try: sort -k2 -n data.txt",
+]
+solution = "sort -k2 -n data.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "Alice 95\nBob 72\nCharlie 87\nDiana 61\n"
+
+[[exercises]]
+id = "sort.6"
+difficulty = "advanced"
+question = """The file `data.csv` is comma-separated with name and age.
+Sort by age (second field) numerically, using comma as field separator."""
+expected_output = "Bob,25\nAlice,30\nCharlie,35\n"
+hints = [
+  "Use -t, to set comma as separator, then -k2 -n",
+  "Try: sort -t, -k2 -n data.csv",
+]
+solution = "sort -t, -k2 -n data.csv"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.csv"
+content = "Alice,30\nBob,25\nCharlie,35\n"

@@ -1,0 +1,14 @@
+# Rust build output
+/target/
+
+# macOS
+.DS_Store
+
+# Claude Code / AI tooling
+.claude/
+AGENTS.md
+
+# Editor directories
+.cursor/
+.idea/
+.vscode/

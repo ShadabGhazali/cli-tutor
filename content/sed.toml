@@ -1,0 +1,222 @@
+[module]
+name = "sed"
+description = "Stream editor for filtering and transforming text"
+version = 1
+
+[intro]
+text = """
+## What is sed?
+
+`sed` (stream editor) reads input line by line and applies editing commands. It's ideal for substitution, deletion, and transformation of text in scripts.
+
+## Basic Syntax
+
+```
+sed [OPTIONS] 'command' file
+sed [OPTIONS] -e 'cmd1' -e 'cmd2' file
+```
+
+## Common Commands
+
+- `s/pattern/replacement/` — substitute first match per line
+- `s/pattern/replacement/g` — substitute all matches per line
+- `s/pattern/replacement/i` — case-insensitive substitute
+- `/pattern/d` — delete lines matching pattern
+- `Nd` — delete line number N
+- `p` — print (usually with `-n` to suppress default output)
+- `q` — quit after first match
+
+## Address Ranges
+
+- `2,5s/a/b/` — apply only to lines 2–5
+- `/start/,/end/d` — delete from line matching 'start' to 'end'
+"""
+
+[[examples]]
+title = "Simple substitution"
+description = "Replace the first occurrence of 'foo' with 'bar' on each line"
+command = "sed 's/foo/bar/' file.txt"
+output = "bar baz foo\nbar qux\n"
+
+[[examples]]
+title = "Global substitution"
+description = "Replace ALL occurrences of 'foo' with 'bar'"
+command = "sed 's/foo/bar/g' file.txt"
+output = "bar baz bar\nbar qux\n"
+
+[[examples]]
+title = "Delete matching lines"
+description = "Remove all lines that contain 'debug'"
+command = "sed '/debug/d' log.txt"
+output = "INFO: started\nERROR: failed\n"
+
+[[exercises]]
+id = "sed.1"
+difficulty = "beginner"
+question = """The file `text.txt` contains several lines.
+Replace every occurrence of 'cat' with 'dog' (globally on each line)."""
+expected_output = "I have a dog.\nMy dog is friendly.\nThe dog sat on the mat.\n"
+hints = [
+  "Use the s command with the g flag for global replacement",
+  "Try: sed 's/cat/dog/g' text.txt",
+]
+solution = "sed 's/cat/dog/g' text.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "text.txt"
+content = "I have a cat.\nMy cat is friendly.\nThe cat sat on the mat.\n"
+
+[[exercises]]
+id = "sed.2"
+difficulty = "beginner"
+question = """The file `log.txt` has log lines.
+Delete all lines that contain the word 'DEBUG'."""
+expected_output = "INFO: server started\nERROR: disk full\nWARN: low memory\n"
+hints = [
+  "Use /pattern/d to delete matching lines",
+  "Try: sed '/DEBUG/d' log.txt",
+]
+solution = "sed '/DEBUG/d' log.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "log.txt"
+content = "INFO: server started\nDEBUG: request received\nERROR: disk full\nDEBUG: response sent\nWARN: low memory\n"
+
+[[exercises]]
+id = "sed.3"
+difficulty = "beginner"
+question = """The file `data.txt` has lines.
+Print only lines 2 through 4 (using sed with -n and the p command)."""
+expected_output = "line two\nline three\nline four\n"
+hints = [
+  "Use -n to suppress default output, then 2,4p to print lines 2-4",
+  "Try: sed -n '2,4p' data.txt",
+]
+solution = "sed -n '2,4p' data.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "line one\nline two\nline three\nline four\nline five\n"
+
+[[exercises]]
+id = "sed.4"
+difficulty = "beginner"
+question = """The file `names.txt` has names in lowercase.
+Capitalize just the first letter of each name (change the first character from lowercase to uppercase)."""
+expected_output = "Alice\nBob\nCharlie\n"
+hints = [
+  "Use sed with a backreference: s/^\\(\\w\\)/\\u\\1/ on GNU sed",
+  "Try: sed 's/^./\\u&/' names.txt  (GNU sed only)",
+]
+solution = "sed 's/^./\\u&/' names.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "names.txt"
+content = "alice\nbob\ncharlie\n"
+
+[[exercises]]
+id = "sed.5"
+difficulty = "intermediate"
+question = """The file `config.txt` has key=value lines and comment lines starting with '#'.
+Remove all comment lines and blank lines, printing only the active config."""
+expected_output = "host=localhost\nport=8080\ndebug=false\n"
+hints = [
+  "Delete lines starting with # and empty lines",
+  "Try: sed '/^#/d; /^$/d' config.txt",
+]
+solution = "sed '/^#/d; /^$/d' config.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "config.txt"
+content = "# Server config\nhost=localhost\n\n# Port\nport=8080\n# Options\ndebug=false\n"
+
+[[exercises]]
+id = "sed.6"
+difficulty = "intermediate"
+question = """The file `html.txt` has simple HTML with <b> tags.
+Remove all HTML tags (anything between < and >)."""
+expected_output = "Hello world\nThis is bold text\n"
+hints = [
+  "Use s/<[^>]*>//g to match and delete tags",
+  "Try: sed 's/<[^>]*>//g' html.txt",
+]
+solution = "sed 's/<[^>]*>//g' html.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "html.txt"
+content = "<p>Hello <b>world</b></p>\n<p>This is <b>bold</b> text</p>\n"
+
+[[exercises]]
+id = "sed.7"
+difficulty = "intermediate"
+question = """The file `script.sh` has shell lines.
+Add a '#' comment character at the beginning of every line that contains 'echo'."""
+expected_output = "#echo \"Hello\"\nls -la\n#echo \"Done\"\nexit 0\n"
+hints = [
+  "Use s/^/#/ with an address to match 'echo' lines",
+  "Try: sed '/echo/s/^/#/' script.sh",
+]
+solution = "sed '/echo/s/^/#/' script.sh"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "script.sh"
+content = "echo \"Hello\"\nls -la\necho \"Done\"\nexit 0\n"
+
+[[exercises]]
+id = "sed.8"
+difficulty = "intermediate"
+question = """The file `data.txt` has lines.
+Replace the content between lines marked 'START' and 'END' (inclusive) with just a single line saying 'REDACTED'."""
+expected_output = "before\nREDACTED\nafter\n"
+hints = [
+  "Use a range address /START/,/END/ with c\\ to replace",
+  "Try: sed '/START/,/END/c\\REDACTED' data.txt",
+]
+solution = "sed '/START/,/END/c\\REDACTED' data.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "before\nSTART\nsecret data\nmore secrets\nEND\nafter\n"
+
+[[exercises]]
+id = "sed.9"
+difficulty = "advanced"
+question = """The file `words.txt` has one word per line.
+Use sed to double every word — print each word twice on the same line separated by a space.
+E.g. 'hello' becomes 'hello hello'."""
+expected_output = "apple apple\nbanana banana\ncherry cherry\n"
+hints = [
+  "Capture the whole line with .* and use a backreference \\1",
+  "Try: sed 's/\\(.*\\)/\\1 \\1/' words.txt",
+]
+solution = "sed 's/\\(.*\\)/\\1 \\1/' words.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "apple\nbanana\ncherry\n"
+
+[[exercises]]
+id = "sed.10"
+difficulty = "advanced"
+question = """The file `csv.txt` uses commas as delimiters.
+Swap the first and second fields on each line."""
+expected_output = "New York,Alice,Engineer\nLos Angeles,Bob,Designer\nChicago,Charlie,Manager\n"
+hints = [
+  "Capture two groups with \\( \\) and swap with \\2,\\1",
+  "Try: sed 's/^\\([^,]*\\),\\([^,]*\\)/\\2,\\1/' csv.txt",
+]
+solution = "sed 's/^\\([^,]*\\),\\([^,]*\\)/\\2,\\1/' csv.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "csv.txt"
+content = "Alice,New York,Engineer\nBob,Los Angeles,Designer\nCharlie,Chicago,Manager\n"

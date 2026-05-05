@@ -1,0 +1,2 @@
+# Module display order — command_modules.LOADING.5
+modules = ["grep", "awk", "sed", "find", "xargs", "cut", "sort", "uniq", "tr"]

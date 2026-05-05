@@ -1,0 +1,227 @@
+[module]
+name = "awk"
+description = "Pattern scanning and text processing language"
+version = 1
+
+[intro]
+text = """
+## What is awk?
+
+`awk` is a powerful text-processing language. It reads input line by line, splits each line into fields, and lets you apply actions based on patterns.
+
+## Basic Syntax
+
+```
+awk 'pattern { action }' file
+```
+
+## Key Concepts
+
+- **Fields:** `$1`, `$2`, ... `$NF` (last field). `$0` is the whole line.
+- **FS:** Field separator (default: whitespace). Set with `-F` or `FS=`.
+- **NR:** Current record (line) number.
+- **NF:** Number of fields on the current line.
+- **BEGIN/END:** Special blocks that run before/after processing.
+
+## Common Patterns
+
+`awk '{ print $1 }' file` — print first field of each line
+`awk -F: '{ print $1 }' /etc/passwd` — use `:` as delimiter
+`awk 'NR==3' file` — print only line 3
+`awk '$2 > 100' file` — print lines where field 2 > 100
+`awk 'BEGIN { sum=0 } { sum+=$1 } END { print sum }' file` — sum a column
+"""
+
+[[examples]]
+title = "Print a specific field"
+description = "Extract just the first column from space-separated data"
+command = "awk '{ print $1 }' data.txt"
+output = "alice\nbob\ncharlie\n"
+
+[[examples]]
+title = "Custom delimiter"
+description = "Use colon as field separator to read /etc/passwd-style files"
+command = "awk -F: '{ print $1, $3 }' users.txt"
+output = "root 0\nalice 1001\nbob 1002\n"
+
+[[examples]]
+title = "Conditional filtering"
+description = "Print lines where the second field (score) is greater than 80"
+command = "awk '$2 > 80 { print $1, $2 }' scores.txt"
+output = "alice 95\ncharlie 87\n"
+
+[[examples]]
+title = "Sum a column"
+description = "Compute the total of the second column"
+command = "awk 'BEGIN { sum=0 } { sum+=$2 } END { print sum }' scores.txt"
+output = "265\n"
+
+[[exercises]]
+id = "awk.1"
+difficulty = "beginner"
+question = """The file `people.txt` has lines with name and age separated by spaces.
+Print only the names (first field)."""
+expected_output = "Alice\nBob\nCharlie\nDiana\n"
+hints = [
+  "awk prints fields with $1, $2, etc.",
+  "Try: awk '{ print $1 }' people.txt",
+]
+solution = "awk '{ print $1 }' people.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "people.txt"
+content = "Alice 30\nBob 25\nCharlie 35\nDiana 28\n"
+
+[[exercises]]
+id = "awk.2"
+difficulty = "beginner"
+question = """The file `scores.txt` has student names and scores.
+Print only lines where the score (second field) is greater than 80."""
+expected_output = "Alice 95\nCharlie 87\n"
+hints = [
+  "Use a condition before the action block",
+  "Try: awk '$2 > 80' scores.txt",
+]
+solution = "awk '$2 > 80' scores.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "scores.txt"
+content = "Alice 95\nBob 72\nCharlie 87\nDiana 61\n"
+
+[[exercises]]
+id = "awk.3"
+difficulty = "beginner"
+question = """The file `csv.txt` uses commas as delimiters.
+Print the second field (city) from each line."""
+expected_output = "New York\nLos Angeles\nChicago\n"
+hints = [
+  "Use -F to set the field separator",
+  "Try: awk -F, '{ print $2 }' csv.txt",
+]
+solution = "awk -F, '{ print $2 }' csv.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "csv.txt"
+content = "Alice,New York,Engineer\nBob,Los Angeles,Designer\nCharlie,Chicago,Manager\n"
+
+[[exercises]]
+id = "awk.4"
+difficulty = "beginner"
+question = """The file `numbers.txt` has one number per line.
+Use awk to compute and print the sum of all numbers."""
+expected_output = "150\n"
+hints = [
+  "Accumulate in a variable, print in END block",
+  "Try: awk '{ sum += $1 } END { print sum }' numbers.txt",
+]
+solution = "awk '{ sum += $1 } END { print sum }' numbers.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "numbers.txt"
+content = "10\n20\n30\n40\n50\n"
+
+[[exercises]]
+id = "awk.5"
+difficulty = "intermediate"
+question = """The file `data.txt` has lines with name and score.
+Print the name and score for lines where the score is between 50 and 80 (inclusive)."""
+expected_output = "Bob 72\nDiana 61\nEve 55\n"
+hints = [
+  "Use && to combine conditions",
+  "Try: awk '$2 >= 50 && $2 <= 80' data.txt",
+]
+solution = "awk '$2 >= 50 && $2 <= 80' data.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "Alice 95\nBob 72\nCharlie 87\nDiana 61\nEve 55\nFrank 42\n"
+
+[[exercises]]
+id = "awk.6"
+difficulty = "intermediate"
+question = """The file `log.txt` has lines prefixed with line numbers using NR.
+Print each line prefixed with its line number and a colon (e.g. '1: first line')."""
+expected_output = "1: apple\n2: banana\n3: cherry\n"
+hints = [
+  "NR holds the current line number",
+  "Try: awk '{ print NR\": \"$0 }' log.txt",
+]
+solution = "awk '{ print NR\": \"$0 }' log.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "log.txt"
+content = "apple\nbanana\ncherry\n"
+
+[[exercises]]
+id = "awk.7"
+difficulty = "intermediate"
+question = """The file `employees.txt` has department, name, and salary fields.
+Print the average salary of all employees."""
+expected_output = "75000\n"
+hints = [
+  "Sum the salary field ($3) and divide by NR at the END",
+  "Try: awk '{ sum+=$3 } END { print sum/NR }' employees.txt",
+]
+solution = "awk '{ sum+=$3 } END { print sum/NR }' employees.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "employees.txt"
+content = "Engineering Alice 80000\nMarketing Bob 60000\nEngineering Charlie 90000\nMarketing Diana 70000\n"
+
+[[exercises]]
+id = "awk.8"
+difficulty = "intermediate"
+question = """The file `data.csv` uses commas. Print each line reformatted as 'NAME is AGE years old'."""
+expected_output = "Alice is 30 years old\nBob is 25 years old\nCharlie is 35 years old\n"
+hints = [
+  "Use -F, and string concatenation in print",
+  "Try: awk -F, '{ print $1 \" is \" $2 \" years old\" }' data.csv",
+]
+solution = "awk -F, '{ print $1 \" is \" $2 \" years old\" }' data.csv"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.csv"
+content = "Alice,30\nBob,25\nCharlie,35\n"
+
+[[exercises]]
+id = "awk.9"
+difficulty = "advanced"
+question = """The file `sales.txt` has product and amount per line.
+Print a summary: each unique product and its total sales amount."""
+expected_output = "apple 150\nbanana 90\norange 60\n"
+hints = [
+  "Use an associative array to accumulate totals per product",
+  "In END, iterate over the array with for (key in arr)",
+  "Try: awk '{ total[$1]+=$2 } END { for (p in total) print p, total[p] }' sales.txt | sort",
+]
+solution = "awk '{ total[$1]+=$2 } END { for (p in total) print p, total[p] }' sales.txt | sort"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "sales.txt"
+content = "apple 50\nbanana 30\napple 60\norange 60\nbanana 60\napple 40\n"
+
+[[exercises]]
+id = "awk.10"
+difficulty = "advanced"
+question = """The file `records.txt` has fields separated by '|'.
+Print lines where the third field starts with 'A', reformatted as 'FIELD1 -> FIELD3'."""
+expected_output = "001 -> Alice\n003 -> Anna\n"
+hints = [
+  "Use -F'|' as delimiter and ~ for regex match",
+  "Try: awk -F'|' '$3 ~ /^A/ { print $1 \" -> \" $3 }' records.txt",
+]
+solution = "awk -F'|' '$3 ~ /^A/ { print $1 \" -> \" $3 }' records.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "records.txt"
+content = "001|Engineering|Alice\n002|Marketing|Bob\n003|Sales|Anna\n004|Engineering|Charlie\n"

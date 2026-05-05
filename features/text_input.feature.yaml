@@ -1,0 +1,42 @@
+feature:
+  name: text_input
+  product: cli-tutor
+  description: >
+    The command input bar where the user types shell commands during exercises.
+    Renders as a single-line input field prefixed with "$ ", captures keystrokes,
+    and submits on Enter.
+
+components:
+  INPUT:
+    name: Input Field
+    description: Text capture and editing behaviour
+    requirements:
+      1: Renders a single-line input field prefixed with the prompt "$ "
+      2: Captures all printable ASCII keystrokes and appends them to the buffer
+      3: Backspace removes the last character from the buffer
+      4: Enter submits the current buffer content and clears the field
+      4-note: Submission with an empty buffer is a no-op (does not trigger execution)
+      5: The cursor is always visible at the end of the current input buffer
+      6: Left/Right arrow keys move the cursor within the buffer for mid-line editing
+      7: Home key moves cursor to start of buffer; End key moves to end
+      8: Ctrl+U clears the entire input buffer (readline convention)
+      9: Ctrl+W deletes the last word (whitespace-delimited) from the buffer
+      10: The field is only active (accepts input) when the app is in Exercise view mode
+      10-note: In Intro and Examples views, keystrokes are consumed by scroll navigation instead
+
+  DISPLAY:
+    name: Visual Display
+    description: How the input bar looks in the layout
+    requirements:
+      1: Input bar occupies a fixed single-row region at the bottom of the content pane
+      2: When active, the field has a highlighted border (distinct color from inactive state)
+      3: When the buffer is longer than the visible width, the text scrolls horizontally to keep the cursor in view
+      4: The prompt "$ " is styled differently from user input text (dimmed vs normal)
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Input state is stored as a Vec<char> with a usize cursor position — not a raw String — to support mid-line editing correctly with multi-byte chars
+      2: No external crate is used for input handling; all key event processing uses crossterm KeyEvent directly
+      3: Input processing must complete in < 1ms (it is on the hot path of the event loop)

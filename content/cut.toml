@@ -1,0 +1,129 @@
+[module]
+name = "cut"
+description = "Remove sections from each line of files"
+version = 1
+
+[intro]
+text = """
+## What is cut?
+
+`cut` removes sections from each line of a file or stdin. It's useful for extracting columns from delimited text or fixed-width data.
+
+## Basic Syntax
+
+```
+cut [OPTIONS] [file]
+```
+
+## Common Options
+
+- `-d DELIM` — use DELIM as field delimiter (default: tab)
+- `-f LIST` — select fields (columns) by number
+- `-c LIST` — select characters by position
+- `-f 1,3` — fields 1 and 3
+- `-f 1-3` — fields 1 through 3
+- `-f 2-` — field 2 to end
+
+## Examples
+
+`cut -d: -f1 /etc/passwd` — print usernames
+`cut -d, -f1,3 data.csv` — print columns 1 and 3 of CSV
+`cut -c1-10 file.txt` — print first 10 characters of each line
+"""
+
+[[examples]]
+title = "Extract a field from CSV"
+description = "Get the second column from a comma-separated file"
+command = "cut -d, -f2 data.csv"
+output = "city\nNew York\nLos Angeles\n"
+
+[[examples]]
+title = "Extract characters"
+description = "Get the first 3 characters of each line"
+command = "cut -c1-3 words.txt"
+output = "app\nban\nche\n"
+
+[[exercises]]
+id = "cut.1"
+difficulty = "beginner"
+question = """The file `data.csv` has comma-separated fields.
+Extract just the first field (name) from each line."""
+expected_output = "Alice\nBob\nCharlie\n"
+hints = [
+  "Use -d, to set comma as delimiter and -f1 for the first field",
+  "Try: cut -d, -f1 data.csv",
+]
+solution = "cut -d, -f1 data.csv"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.csv"
+content = "Alice,30,Engineer\nBob,25,Designer\nCharlie,35,Manager\n"
+
+[[exercises]]
+id = "cut.2"
+difficulty = "beginner"
+question = """The file `data.csv` has comma-separated fields: name, age, role.
+Extract the first and third fields (name and role)."""
+expected_output = "Alice,Engineer\nBob,Designer\nCharlie,Manager\n"
+hints = [
+  "Use -f1,3 to select fields 1 and 3",
+  "Try: cut -d, -f1,3 data.csv",
+]
+solution = "cut -d, -f1,3 data.csv"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.csv"
+content = "Alice,30,Engineer\nBob,25,Designer\nCharlie,35,Manager\n"
+
+[[exercises]]
+id = "cut.3"
+difficulty = "beginner"
+question = """The file `fixed.txt` has fixed-width data.
+Extract only the first 5 characters from each line."""
+expected_output = "Alice\nBob  \nEve  \n"
+hints = [
+  "Use -c1-5 to select the first 5 characters",
+  "Try: cut -c1-5 fixed.txt",
+]
+solution = "cut -c1-5 fixed.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "fixed.txt"
+content = "Alice 30 Engineer\nBob   25 Designer\nEve   28 Analyst \n"
+
+[[exercises]]
+id = "cut.4"
+difficulty = "intermediate"
+question = """The file `passwd.txt` is in /etc/passwd format (colon-separated).
+Extract the username (field 1) and home directory (field 6) from each line."""
+expected_output = "root:/root\nalice:/home/alice\nbob:/home/bob\n"
+hints = [
+  "Use -d: and -f1,6 to extract fields 1 and 6",
+  "Try: cut -d: -f1,6 passwd.txt",
+]
+solution = "cut -d: -f1,6 passwd.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "passwd.txt"
+content = "root:x:0:0:root:/root:/bin/bash\nalice:x:1001:1001::/home/alice:/bin/bash\nbob:x:1002:1002::/home/bob:/bin/zsh\n"
+
+[[exercises]]
+id = "cut.5"
+difficulty = "intermediate"
+question = """The file `data.csv` has 4 comma-separated fields.
+Extract fields 2 through 4 (all except the first field)."""
+expected_output = "New York,30,Engineer\nLos Angeles,25,Designer\nChicago,35,Manager\n"
+hints = [
+  "Use -f2- to select from field 2 to the end",
+  "Try: cut -d, -f2- data.csv",
+]
+solution = "cut -d, -f2- data.csv"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.csv"
+content = "Alice,New York,30,Engineer\nBob,Los Angeles,25,Designer\nCharlie,Chicago,35,Manager\n"

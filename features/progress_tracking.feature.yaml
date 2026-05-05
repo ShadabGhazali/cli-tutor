@@ -1,0 +1,50 @@
+feature:
+  name: progress_tracking
+  product: cli-tutor
+  description: >
+    Persistence of user progress across sessions. Tracks which exercises have
+    been attempted and which have been completed (with or without hints/solution).
+    Saved to a JSON file in the user's data directory.
+
+components:
+  PERSISTENCE:
+    name: File Persistence
+    description: Load and save progress to disk
+    requirements:
+      1: Progress is stored at `~/.local/share/cli-tutor/progress.json` on Linux/macOS
+      1-note: Use the `dirs` crate (or manual $HOME expansion) for the base path; fall back to $HOME/.cli-tutor/progress.json if XDG dir is unavailable
+      2: Progress is loaded once at startup into an in-memory HashMap
+      3: Progress is written to disk after every state change (correct answer, solution reveal)
+      4: If the progress file does not exist, start with an empty HashMap and create the file on first save
+      5: If the progress file exists but fails to parse (corrupt JSON), log a warning to stderr and start fresh — do not crash
+      6: The parent directory is created automatically if it does not exist (std::fs::create_dir_all)
+      7: File writes are atomic — write to a `.tmp` file first, then rename over the target
+
+  TRACKING:
+    name: Progress State
+    description: What is tracked per exercise
+    requirements:
+      1: Each exercise can be in one of four states — Unseen, Attempted, CompletedUnaided, CompletedWithHelp
+      2: CompletedUnaided — user submitted the correct answer without revealing any hints or the solution
+      3: CompletedWithHelp — user submitted the correct answer after revealing at least one hint or the solution
+      4: An exercise moves from CompletedWithHelp to CompletedUnaided if the user later solves it without help in the same session
+      4-note: Progress can improve but never regress within a session
+      5: Attempt count per exercise is tracked (incremented on every submission regardless of outcome)
+
+  DISPLAY:
+    name: Progress Display in UI
+    description: How progress is visualized
+    requirements:
+      1: Module list shows per-module completion ratio (e.g. "7/12") next to each module name
+      2: Completed-unaided exercises are marked with ✓ (green); completed-with-help with ◑ (yellow); attempted with · (dim); unseen are unmarked
+      3: The header bar shows the current module's completion count (e.g. "grep: 3/12 ✓")
+      4: A summary screen is accessible via `S` key showing completion stats across all modules in a table
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Progress serialization uses serde_json — no manual JSON construction
+      2: The Progress struct implements Default (returns empty HashMap) for the fresh-start case
+      3: All disk I/O for progress happens in progress.rs — no file operations in app.rs or ui/
+      4: Progress file writes must not block the UI event loop — if write latency becomes a concern, use a background thread (not required for v1.0 but the architecture must not preclude it)

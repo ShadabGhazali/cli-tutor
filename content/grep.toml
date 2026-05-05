@@ -1,0 +1,292 @@
+[module]
+name = "grep"
+description = "Search for patterns in files using regular expressions"
+version = 1
+
+[intro]
+text = """
+## What is grep?
+
+`grep` stands for **Global Regular Expression Print**. It searches one or more files for lines containing a match to a specified pattern and prints the matching lines.
+
+## Basic Syntax
+
+```
+grep [OPTIONS] PATTERN [FILE...]
+```
+
+## Common Flags
+
+- `-i` — case-insensitive matching
+- `-v` — invert match (print lines that do NOT match)
+- `-n` — prefix each line with its line number
+- `-c` — print only a count of matching lines
+- `-l` — print only filenames of files with matches
+- `-r` — search recursively through directories
+- `-E` — use extended regular expressions (same as `egrep`)
+
+## Examples at a Glance
+
+`grep 'error' app.log` — find lines containing "error"
+`grep -i 'ERROR' app.log` — case-insensitive
+`grep -v 'debug' app.log` — lines that do NOT contain "debug"
+`grep -n 'TODO' *.rs` — show line numbers in Rust files
+"""
+
+[[examples]]
+title = "Basic pattern search"
+description = "Find all lines containing the word 'mango' in fruits.txt"
+command = "grep 'mango' fruits.txt"
+output = """mango
+mango chutney
+"""
+
+[[examples]]
+title = "Case-insensitive search"
+description = "Search without caring about upper/lower case"
+command = "grep -i 'MANGO' fruits.txt"
+output = """mango
+mango chutney
+"""
+
+[[examples]]
+title = "Invert match"
+description = "Print lines that do NOT contain 'mango'"
+command = "grep -v 'mango' fruits.txt"
+output = """apple
+banana
+grape
+"""
+
+[[examples]]
+title = "Show line numbers"
+description = "Prefix each matching line with its line number"
+command = "grep -n 'mango' fruits.txt"
+output = """2:mango
+4:mango chutney
+"""
+
+[[examples]]
+title = "Count matches"
+description = "Print only the number of matching lines"
+command = "grep -c 'mango' fruits.txt"
+output = "2\n"
+
+[[exercises]]
+id = "grep.1"
+difficulty = "beginner"
+question = """The file `fruits.txt` contains one fruit per line.
+Find all lines that contain the word 'mango'."""
+expected_output = "mango\nmango chutney\n"
+hints = [
+  "Use grep with the pattern 'mango'",
+  "Try: grep 'mango' fruits.txt",
+]
+solution = "grep 'mango' fruits.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "fruits.txt"
+content = "apple\nmango\nbanana\nmango chutney\ngrape\n"
+
+[[exercises]]
+id = "grep.2"
+difficulty = "beginner"
+question = """The file `words.txt` contains one word per line.
+Find all lines containing 'cat', ignoring case (so 'Cat', 'CAT', etc. all match)."""
+expected_output = "cat\nCat\nCAT\ncatalogue\n"
+hints = [
+  "Use the -i flag for case-insensitive matching",
+  "Try: grep -i 'cat' words.txt",
+]
+solution = "grep -i 'cat' words.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "dog\ncat\nbird\nCat\nfish\nCAT\ncatalogue\nbear\n"
+
+[[exercises]]
+id = "grep.3"
+difficulty = "beginner"
+question = """The file `log.txt` contains log lines.
+Print only the lines that do NOT contain the word 'INFO'."""
+expected_output = "ERROR: disk full\nWARN: low memory\nERROR: timeout\n"
+hints = [
+  "Use the -v flag to invert the match",
+  "Try: grep -v 'INFO' log.txt",
+]
+solution = "grep -v 'INFO' log.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "log.txt"
+content = "INFO: server started\nERROR: disk full\nINFO: request received\nWARN: low memory\nINFO: response sent\nERROR: timeout\n"
+
+[[exercises]]
+id = "grep.4"
+difficulty = "beginner"
+question = """The file `code.py` contains Python source code.
+Find all lines containing 'def' and show their line numbers."""
+expected_output = "2:def greet(name):\n5:def add(a, b):\n9:def main():\n"
+hints = [
+  "Use the -n flag to show line numbers",
+  "Try: grep -n 'def' code.py",
+]
+solution = "grep -n 'def' code.py"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "code.py"
+content = "import sys\ndef greet(name):\n    print(f'Hello, {name}')\n\ndef add(a, b):\n    return a + b\n\n# Entry point\ndef main():\n    greet('world')\n"
+
+[[exercises]]
+id = "grep.5"
+difficulty = "beginner"
+question = """The file `data.txt` has several lines.
+Count how many lines contain the word 'error' (case-insensitive)."""
+expected_output = "3\n"
+hints = [
+  "Combine -i (case-insensitive) and -c (count) flags",
+  "Try: grep -ic 'error' data.txt",
+]
+solution = "grep -ic 'error' data.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "Connection established\nERROR: timeout\nRetrying...\nerror: bad request\nSuccess\nError: not found\nDone\n"
+
+[[exercises]]
+id = "grep.6"
+difficulty = "intermediate"
+question = """The file `emails.txt` has one email address per line.
+Find all lines that match a basic email pattern: something@something.something
+Use extended regex with grep -E."""
+expected_output = "user@example.com\nadmin@test.org\nsupport@company.co\n"
+hints = [
+  "Use grep -E for extended regex",
+  "An email pattern: [a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}",
+  "Try: grep -E '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' emails.txt",
+]
+solution = "grep -E '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' emails.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "emails.txt"
+content = "user@example.com\nnot-an-email\nadmin@test.org\njust-text\nsupport@company.co\n@missing-user.com\n"
+
+[[exercises]]
+id = "grep.7"
+difficulty = "intermediate"
+question = """The file `access.log` has web server access entries.
+Find all lines where the HTTP status code is 404.
+The format is: IP - - [date] \"METHOD /path HTTP/1.1\" STATUS size"""
+expected_output = "192.168.1.5 - - [01/Jan/2024] \"GET /missing HTTP/1.1\" 404 0\n192.168.1.9 - - [01/Jan/2024] \"GET /gone HTTP/1.1\" 404 0\n"
+hints = [
+  "Search for the literal string ' 404 '",
+  "Try: grep ' 404 ' access.log",
+]
+solution = "grep ' 404 ' access.log"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.1 - - [01/Jan/2024] \"GET /index HTTP/1.1\" 200 1234\n192.168.1.2 - - [01/Jan/2024] \"POST /login HTTP/1.1\" 302 0\n192.168.1.5 - - [01/Jan/2024] \"GET /missing HTTP/1.1\" 404 0\n192.168.1.7 - - [01/Jan/2024] \"GET /api HTTP/1.1\" 200 567\n192.168.1.9 - - [01/Jan/2024] \"GET /gone HTTP/1.1\" 404 0\n"
+
+[[exercises]]
+id = "grep.8"
+difficulty = "intermediate"
+question = """The file `names.txt` has one name per line.
+Find all names that start with a capital letter followed by lowercase letters (i.e. properly capitalized single words like 'Alice' or 'Bob')."""
+expected_output = "Alice\nBob\nCharlie\n"
+hints = [
+  "Use grep -E with a pattern anchored to start of line",
+  "A capitalized word: ^[A-Z][a-z]+$",
+  "Try: grep -E '^[A-Z][a-z]+$' names.txt",
+]
+solution = "grep -E '^[A-Z][a-z]+$' names.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "names.txt"
+content = "Alice\nbob\nBob\nALICE\nCharlie\njohn DOE\nEve\neve\n"
+
+[[exercises]]
+id = "grep.9"
+difficulty = "intermediate"
+question = """The directory structure has a file `src/main.rs`.
+Use recursive grep to find all lines in the `src/` directory containing the word 'TODO'."""
+expected_output = "src/main.rs:// TODO: add error handling\nsrc/utils.rs:// TODO: refactor this\n"
+hints = [
+  "Use the -r flag to search recursively",
+  "Try: grep -r 'TODO' src/",
+]
+solution = "grep -r 'TODO' src/"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "src/main.rs"
+content = "fn main() {\n    // TODO: add error handling\n    println!(\"Hello\");\n}\n"
+
+[[exercises.fixtures]]
+filename = "src/utils.rs"
+content = "// TODO: refactor this\npub fn helper() {}\n"
+
+[[exercises.fixtures]]
+filename = "src/lib.rs"
+content = "pub mod utils;\n"
+
+[[exercises]]
+id = "grep.10"
+difficulty = "advanced"
+question = """The file `config.ini` has key=value pairs, some commented out with '#'.
+Print only the active (non-comment) lines that contain an '=' sign."""
+expected_output = "host=localhost\nport=8080\ndebug=false\n"
+hints = [
+  "First filter out comment lines (starting with #), then look for =",
+  "You can pipe two grep commands together",
+  "Try: grep -v '^#' config.ini | grep '='",
+]
+solution = "grep -v '^#' config.ini | grep '='"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "config.ini"
+content = "# Database config\nhost=localhost\nport=8080\n# Uncomment to enable\n# verbose=true\ndebug=false\n"
+
+[[exercises]]
+id = "grep.11"
+difficulty = "advanced"
+question = """The file `report.txt` has lines of text.
+Use grep to print lines that contain either 'apple' or 'orange' (case-insensitive)."""
+expected_output = "I like apples.\nOrange juice is healthy.\nApple pie is great.\n"
+hints = [
+  "Use grep -E with alternation: pattern1|pattern2",
+  "Combine with -i for case-insensitive",
+  "Try: grep -iE 'apple|orange' report.txt",
+]
+solution = "grep -iE 'apple|orange' report.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "report.txt"
+content = "I like apples.\nBananas are yellow.\nOrange juice is healthy.\nGrapes are purple.\nApple pie is great.\nMango is tropical.\n"
+
+[[exercises]]
+id = "grep.12"
+difficulty = "advanced"
+question = """The file `numbers.txt` has one number per line.
+Find all lines containing a number with exactly 3 digits (no more, no less)."""
+expected_output = "123\n456\n789\n"
+hints = [
+  "Use word boundaries or line anchors with grep -E",
+  "Pattern for exactly 3 digits: ^[0-9]{3}$",
+  "Try: grep -E '^[0-9]{3}$' numbers.txt",
+]
+solution = "grep -E '^[0-9]{3}$' numbers.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "numbers.txt"
+content = "12\n123\n1234\n456\n56\n789\n9000\n"

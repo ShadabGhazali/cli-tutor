@@ -1,0 +1,64 @@
+feature:
+  name: command_modules
+  product: cli-tutor
+  description: >
+    The content system: loading, validating, and registering command learning
+    modules (grep, awk, sed, etc.) from bundled TOML files. Each module contains
+    an intro, a list of worked examples, and a list of exercises with fixtures.
+
+components:
+  LOADING:
+    name: Content Loading
+    description: How TOML modules are loaded into the app
+    requirements:
+      1: All TOML content files are embedded into the binary at compile time using `include_str!()` macros
+      2: TOML files are deserialized into typed Rust structs at startup using serde + toml
+      3: If any bundled TOML file fails to deserialize, the app panics at startup with a clear message naming the file and the parse error
+      3-note: This is intentional — malformed bundled content is a developer error, not a runtime error
+      4: The module registry (a Vec<Module> sorted by display order) is constructed once and stored in App
+      5: Module display order matches the order defined in a top-level `modules.toml` index file
+
+  SCHEMA:
+    name: TOML Schema
+    description: Required fields and structure of each module file
+    requirements:
+      1: Each TOML file must have a `[module]` section with `name` (String) and `description` (String)
+      2: Each TOML file must have an `[intro]` section with a `text` field (multiline String)
+      3: Examples are defined as `[[examples]]` arrays; each must have `title`, `command`, and `output` fields
+      4: Exercises are defined as `[[exercises]]` arrays; each must have `id`, `difficulty`, `question`, `expected_output`, `hints` (array), `solution`, and `match_mode`
+      5: Exercise `id` values must be unique across all modules — validated at startup
+      6: `difficulty` must be one of the strings "beginner", "intermediate", or "advanced" — deserialization fails on any other value
+      7: `match_mode` must be one of "exact", "normalized", "sorted", "regex" — deserialization fails on any other value
+      8: Fixtures are optional — exercises without fixtures are valid (user runs commands without file input)
+
+  MODULES:
+    name: Bundled Modules (v1.0)
+    description: The nine command modules shipped at launch
+    requirements:
+      1: grep module — 12 exercises covering basic patterns, common flags (-i -v -r -n -c -l), extended regex
+      2: awk module — 10 exercises covering field splitting, print, conditions, BEGIN/END blocks, arithmetic
+      3: sed module — 10 exercises covering substitution (s///), deletion, address ranges, grouping
+      4: find module — 9 exercises covering -name, -type, -mtime, -size, -exec, combining predicates
+      5: xargs module — 6 exercises covering basic piping, -I{}, -0, -P (parallel), combining with find
+      6: cut module — 5 exercises covering -d (delimiter), -f (fields), -c (characters), combining ranges
+      7: sort module — 6 exercises covering -n, -r, -k, -u, -t (field separator), stable sort
+      8: uniq module — 4 exercises covering -c (count), -d (duplicates only), -u (unique only), pipeline with sort
+      9: tr module — 4 exercises covering character set translation, -d (delete), -s (squeeze), ranges
+
+  VALIDATION:
+    name: Startup Validation
+    description: Checks performed when the app starts
+    requirements:
+      1: All exercise IDs are checked for uniqueness — duplicate IDs cause a panic with the conflicting ID named
+      2: All cross-references in exercise TOML (if any field references another exercise or module by name) are validated
+      3: Every `regex` match_mode exercise's `expected_output` is compiled as a regex at startup — invalid regex causes a panic
+      4: Total exercise count is logged to stderr in debug builds (e.g. "Loaded 9 modules, 66 exercises")
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Content structs (Module, Example, Exercise, Fixture) are defined in src/content/types.rs and derive Clone, Debug, Deserialize
+      2: The module registry is a Vec<Module> — order is deterministic and matches modules.toml
+      3: Content loading code lives entirely in src/content/mod.rs
+      4: No runtime file I/O for content — everything is embedded; content/ directory is only used at compile time

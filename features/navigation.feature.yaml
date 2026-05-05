@@ -1,0 +1,65 @@
+feature:
+  name: navigation
+  product: cli-tutor
+  description: >
+    All keyboard-driven navigation within the app: switching between command
+    modules in the left panel, cycling between content views (Intro / Examples /
+    Exercises), and moving between individual exercises.
+
+components:
+  MODULE_LIST:
+    name: Command Module List
+    description: Navigation within the left panel
+    requirements:
+      1: Up/Down arrow keys move the selection highlight through the command module list
+      2: Pressing Down on the last item wraps to the first; pressing Up on the first wraps to the last
+      3: The highlighted module is immediately reflected in the content pane (no confirmation needed)
+      4: The list is scrollable if the number of modules exceeds the panel height
+      5: Each list item displays the module name, total exercise count, and a compact completion badge (e.g. "7/12 ✓")
+
+  VIEW_CYCLE:
+    name: Content View Cycling
+    description: Switching between Intro, Examples, and Exercise views
+    requirements:
+      1: Tab cycles forward through the three content views in order: Intro → Examples → Exercises → Intro
+      2: Shift+Tab cycles in reverse
+      3: The active view is indicated by a highlighted tab label in the content pane header
+      4: When switching modules, the view resets to Intro
+      5: Pressing `e` from any view jumps directly to Exercises
+
+  EXERCISE_NAV:
+    name: Exercise-to-Exercise Navigation
+    description: Moving between individual exercises within a module
+    requirements:
+      1: Right arrow or `n` advances to the next exercise; Left arrow or `p` goes to the previous
+      2: At the first exercise, Left/`p` is a no-op (no wrap-around)
+      3: At the last exercise, Right/`n` is a no-op (no wrap-around)
+      4: Exercise position indicator is shown as "Exercise N / Total" (e.g. "Exercise 3 / 12")
+      5: Navigating away from an exercise preserves the attempt history — it is not reset
+
+  SCROLL:
+    name: Content Scrolling
+    description: Scrolling long text in Intro and Examples views
+    requirements:
+      1: Up/Down arrows scroll the content pane when in Intro or Examples view (not the module list)
+      2-note: Up/Down navigates the module list only when focus is explicitly on the list panel
+      2: Page Up / Page Down scroll by the visible panel height
+      3: `g` / `G` jump to the top / bottom of the content respectively
+      4: A scroll position indicator (e.g. a scrollbar or "line N/Total") is visible when content overflows
+
+  GLOBAL:
+    name: Global Keybindings
+    description: App-wide keys active in all views
+    requirements:
+      1: `q` and Ctrl+C quit the application gracefully (terminal state restored)
+      2: `?` toggles a help overlay listing all keybindings; pressing any key dismisses it
+      3: `r` in Exercise view resets the current exercise (re-writes fixtures, clears output, resets hint state)
+      4: Ctrl+L clears the output panel content without resetting exercise state
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: All navigation state (selected module index, active view, exercise index, scroll offset) lives in App struct in app.rs
+      2: Key events are matched in a single `handle_key` function in app.rs — no key handling in ui/ layer
+      3: Navigation must never trigger a re-execution of the user's last command
