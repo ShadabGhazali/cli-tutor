@@ -4,7 +4,13 @@ A terminal app for learning Unix command-line tools by doing. Type real shell co
 
 Covers: `grep`, `awk`, `sed`, `find`, `xargs`, `cut`, `sort`, `uniq`, `tr` — ~66 exercises across beginner to advanced.
 
-## Run
+## Install
+
+```sh
+cargo install cli-tutor
+```
+
+## Run from source
 
 ```sh
 cargo run
