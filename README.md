@@ -8,8 +8,7 @@ Covers: `grep`, `awk`, `sed`, `find`, `xargs`, `cut`, `sort`, `uniq`, `tr` — ~
 
 **Homebrew (macOS/Linux)**
 ```sh
-brew tap ShadabGhazali/cli-tutor
-brew install cli-tutor
+brew install ShadabGhazali/cli-tutor/cli-tutor
 ```
 
 **Cargo**
