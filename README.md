@@ -18,6 +18,18 @@ cargo install cli-tutor
 
 Or grab a pre-built binary from [Releases](https://github.com/ShadabGhazali/cli-tutor/releases).
 
+## Update
+
+**Homebrew**
+```sh
+brew upgrade ShadabGhazali/cli-tutor/cli-tutor
+```
+
+**Cargo**
+```sh
+cargo install cli-tutor --force
+```
+
 ## Run from source
 
 ```sh
