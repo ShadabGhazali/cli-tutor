@@ -92,10 +92,11 @@ fn render_main(app: &App, frame: &mut Frame, area: Rect) {
 fn render_footer(app: &App, frame: &mut Frame, area: Rect) {
     // content_display.LAYOUT.3
     let hints = match app.current_view {
-        ContentView::Intro => " ↑↓ Scroll  Tab: Next view  ↑↓ Module  q: Quit",
-        ContentView::Examples => " ↑↓ Scroll  Tab: Next view  ↑↓ Module  q: Quit",
+        ContentView::Intro | ContentView::Examples => {
+            " ↑↓: Module  Tab: Next view  PgUp/PgDn: Scroll  q: Quit"
+        }
         ContentView::Exercise => {
-            " Enter: Submit  h: Hint  s: Solution  f: Files  r: Reset  Tab: View  q: Quit"
+            " Enter: Submit  ^T: Hint  ^S: Solution  ^F: Files  ^R: Reset  ^N/^P: Next/Prev  Esc: Back"
         }
     };
 

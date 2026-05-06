@@ -70,75 +70,65 @@ fn run_app<B: ratatui::backend::Backend>(terminal: &mut Terminal<B>, app: &mut A
 fn handle_key(app: &mut App, key: KeyEvent) {
     use app::ContentView;
 
-    // Global keys
-    match (key.modifiers, key.code) {
-        (KeyModifiers::NONE, KeyCode::Char('q')) | (KeyModifiers::CONTROL, KeyCode::Char('c')) => {
-            app.should_quit = true;
-            return;
-        }
-        (KeyModifiers::NONE, KeyCode::Char('?')) => {
-            app.toggle_help();
-            return;
-        }
-        _ => {}
+    // Ctrl+C quits everywhere
+    if key.modifiers == KeyModifiers::CONTROL && key.code == KeyCode::Char('c') {
+        app.should_quit = true;
+        return;
     }
 
     if app.show_help {
-        // Any key closes help
-        if matches!(key.code, KeyCode::Char('?') | KeyCode::Esc) {
+        if matches!(key.code, KeyCode::Esc) || key.code == KeyCode::Char('?') {
             app.toggle_help();
         }
         return;
     }
 
-    match key.code {
-        KeyCode::Tab => app.cycle_view(),
-        KeyCode::Up => match app.current_view {
-            ContentView::Exercise => app.scroll_up(),
-            _ => {
-                app.select_prev_module();
-            }
-        },
-        KeyCode::Down => match app.current_view {
-            ContentView::Exercise => app.scroll_down(),
-            _ => {
-                app.select_next_module();
-            }
-        },
-        _ => {}
-    }
-
     match app.current_view {
-        ContentView::Intro | ContentView::Examples => handle_scroll_keys(app, key),
+        ContentView::Intro | ContentView::Examples => handle_browse_keys(app, key),
         ContentView::Exercise => handle_exercise_keys(app, key),
     }
 }
 
-fn handle_scroll_keys(app: &mut App, key: KeyEvent) {
-    match key.code {
-        KeyCode::Up => app.scroll_up(),
-        KeyCode::Down => app.scroll_down(),
+fn handle_browse_keys(app: &mut App, key: KeyEvent) {
+    match (key.modifiers, key.code) {
+        (KeyModifiers::NONE, KeyCode::Char('q')) => app.should_quit = true,
+        (KeyModifiers::NONE, KeyCode::Char('?')) => app.toggle_help(),
+        (KeyModifiers::NONE, KeyCode::Tab) => app.cycle_view(),
+        (KeyModifiers::NONE, KeyCode::Up) => app.select_prev_module(),
+        (KeyModifiers::NONE, KeyCode::Down) => app.select_next_module(),
+        (KeyModifiers::NONE, KeyCode::PageUp) => app.scroll_up(),
+        (KeyModifiers::NONE, KeyCode::PageDown) => app.scroll_down(),
         _ => {}
     }
 }
 
 fn handle_exercise_keys(app: &mut App, key: KeyEvent) {
     match (key.modifiers, key.code) {
-        // Navigation — n/p only; Left/Right are reserved for cursor movement
-        (KeyModifiers::NONE, KeyCode::Char('n')) => app.next_exercise(),
-        (KeyModifiers::NONE, KeyCode::Char('p')) => app.prev_exercise(),
-
-        // Exercise actions
-        (KeyModifiers::NONE, KeyCode::Enter) => app.submit_command(),
-        (KeyModifiers::NONE, KeyCode::Char('h')) => app.reveal_next_hint(),
-        (KeyModifiers::NONE, KeyCode::Char('s')) => app.toggle_solution(),
-        (KeyModifiers::NONE, KeyCode::Char('f')) => app.toggle_files(),
-        (KeyModifiers::NONE, KeyCode::Char('r')) => app.reset_exercise(),
+        // Ctrl shortcuts — safe to use while typing
+        (KeyModifiers::CONTROL, KeyCode::Char('n')) => app.next_exercise(),
+        (KeyModifiers::CONTROL, KeyCode::Char('p')) => app.prev_exercise(),
+        (KeyModifiers::CONTROL, KeyCode::Char('t')) => app.reveal_next_hint(),
+        (KeyModifiers::CONTROL, KeyCode::Char('s')) => app.toggle_solution(),
+        (KeyModifiers::CONTROL, KeyCode::Char('f')) => app.toggle_files(),
+        (KeyModifiers::CONTROL, KeyCode::Char('r')) => app.reset_exercise(),
         (KeyModifiers::CONTROL, KeyCode::Char('l')) => app.clear_output(),
 
-        // Text input
+        // View / help
+        (KeyModifiers::NONE, KeyCode::Tab) => app.cycle_view(),
+        (KeyModifiers::NONE, KeyCode::Esc) => app.cycle_view(),
+
+        // Submit
+        (KeyModifiers::NONE, KeyCode::Enter) => app.submit_command(),
+
+        // Scroll output panel
+        (KeyModifiers::NONE, KeyCode::Up) => app.scroll_up(),
+        (KeyModifiers::NONE, KeyCode::Down) => app.scroll_down(),
+
+        // All printable characters go to input — no letter shortcuts here
         (KeyModifiers::NONE, KeyCode::Char(c)) => app.input_push(c),
         (KeyModifiers::SHIFT, KeyCode::Char(c)) => app.input_push(c),
+
+        // Cursor / editing
         (KeyModifiers::NONE, KeyCode::Backspace) => app.input_backspace(),
         (KeyModifiers::NONE, KeyCode::Delete) => app.input_delete(),
         (KeyModifiers::NONE, KeyCode::Left) => app.cursor_left(),
