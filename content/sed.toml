@@ -108,10 +108,10 @@ question = """The file `names.txt` has names in lowercase.
 Capitalize just the first letter of each name (change the first character from lowercase to uppercase)."""
 expected_output = "Alice\nBob\nCharlie\n"
 hints = [
-  "Use sed with a backreference: s/^\\(\\w\\)/\\u\\1/ on GNU sed",
-  "Try: sed 's/^./\\u&/' names.txt  (GNU sed only)",
+  "awk can uppercase a substring: toupper(substr($0,1,1))",
+  "Try: awk '{ print toupper(substr($0,1,1)) substr($0,2) }' names.txt",
 ]
-solution = "sed 's/^./\\u&/' names.txt"
+solution = "awk '{ print toupper(substr($0,1,1)) substr($0,2) }' names.txt"
 match_mode = "exact"
 
 [[exercises.fixtures]]
@@ -176,10 +176,10 @@ question = """The file `data.txt` has lines.
 Replace the content between lines marked 'START' and 'END' (inclusive) with just a single line saying 'REDACTED'."""
 expected_output = "before\nREDACTED\nafter\n"
 hints = [
-  "Use a range address /START/,/END/ with c\\ to replace",
-  "Try: sed '/START/,/END/c\\REDACTED' data.txt",
+  "Use -n to suppress default output, then print non-range lines and replace START",
+  "Try: sed -n '/START/,/END/!p; /START/s/.*/REDACTED/p' data.txt",
 ]
-solution = "sed '/START/,/END/c\\REDACTED' data.txt"
+solution = "sed -n '/START/,/END/!p; /START/s/.*/REDACTED/p' data.txt"
 match_mode = "exact"
 
 [[exercises.fixtures]]

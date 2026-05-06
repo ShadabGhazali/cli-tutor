@@ -124,7 +124,7 @@ id = "xargs.5"
 difficulty = "advanced"
 question = """The file `targets.txt` lists directory names to create.
 Use xargs to create all of them with mkdir."""
-expected_output = "dir_a\ndir_b\ndir_c\n"
+expected_output = "dir_a\ndir_b\ndir_c\ntargets.txt\n"
 hints = [
   "Use xargs mkdir to create directories from the list",
   "Then use ls to verify: cat targets.txt | xargs mkdir && ls",

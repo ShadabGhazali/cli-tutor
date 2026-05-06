@@ -199,7 +199,7 @@ id = "grep.8"
 difficulty = "intermediate"
 question = """The file `names.txt` has one name per line.
 Find all names that start with a capital letter followed by lowercase letters (i.e. properly capitalized single words like 'Alice' or 'Bob')."""
-expected_output = "Alice\nBob\nCharlie\n"
+expected_output = "Alice\nBob\nCharlie\nEve\n"
 hints = [
   "Use grep -E with a pattern anchored to start of line",
   "A capitalized word: ^[A-Z][a-z]+$",
@@ -217,7 +217,7 @@ id = "grep.9"
 difficulty = "intermediate"
 question = """The directory structure has a file `src/main.rs`.
 Use recursive grep to find all lines in the `src/` directory containing the word 'TODO'."""
-expected_output = "src/main.rs:// TODO: add error handling\nsrc/utils.rs:// TODO: refactor this\n"
+expected_output = "src/main.rs:    // TODO: add error handling\nsrc/utils.rs:// TODO: refactor this\n"
 hints = [
   "Use the -r flag to search recursively",
   "Try: grep -r 'TODO' src/",

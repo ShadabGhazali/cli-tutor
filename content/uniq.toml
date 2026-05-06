@@ -61,13 +61,14 @@ content = "banana\napple\ncherry\nbanana\napple\n"
 id = "uniq.2"
 difficulty = "beginner"
 question = """The file `words.txt` has words, some repeated.
-Count how many times each word appears (sort by word first)."""
-expected_output = "      2 apple\n      1 banana\n      3 cherry\n"
+Count how many times each word appears (sort by word first).
+Output format: 'COUNT word' with a single space."""
+expected_output = "2 apple\n1 banana\n3 cherry\n"
 hints = [
-  "Use uniq -c after sorting",
-  "Try: sort words.txt | uniq -c",
+  "Use uniq -c after sorting, then awk to normalise the count column",
+  "Try: sort words.txt | uniq -c | awk '{print $1, $2}'",
 ]
-solution = "sort words.txt | uniq -c"
+solution = "sort words.txt | uniq -c | awk '{print $1, $2}'"
 match_mode = "exact"
 
 [[exercises.fixtures]]

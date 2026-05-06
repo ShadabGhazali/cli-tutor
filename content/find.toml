@@ -151,10 +151,10 @@ question = """Find all `.txt` files and print the count of lines in each using `
 Files: notes.txt (3 lines), readme.txt (2 lines)."""
 expected_output = "3 ./notes.txt\n2 ./sub/readme.txt\n"
 hints = [
-  "Use -exec wc -l {} \\; with find",
-  "Try: find . -name '*.txt' -exec wc -l {} \\;",
+  "Use -exec wc -l {} \\; then pipe through awk to normalize spacing",
+  "Try: find . -name '*.txt' -exec wc -l {} \\; | awk '{print $1, $2}'",
 ]
-solution = "find . -name '*.txt' -exec wc -l {} \\;"
+solution = "find . -name '*.txt' -exec wc -l {} \\; | awk '{print $1, $2}'"
 match_mode = "sorted"
 
 [[exercises.fixtures]]
@@ -201,10 +201,10 @@ Then list all files with execute permission using find -perm."""
 expected_output = "./run.sh\n./deploy.sh\n"
 hints = [
   "First: find . -name '*.sh' -exec chmod +x {} \\;",
-  "Then: find . -perm /u+x -name '*.sh'",
-  "Try combining both: find . -name '*.sh' -exec chmod +x {} \\; && find . -perm /u+x -name '*.sh'",
+  "Then: find . -perm -u+x -name '*.sh'  (note: -u+x not /u+x for portability)",
+  "Try combining both: find . -name '*.sh' -exec chmod +x {} \\; && find . -perm -u+x -name '*.sh'",
 ]
-solution = "find . -name '*.sh' -exec chmod +x {} \\; && find . -perm /u+x -name '*.sh'"
+solution = "find . -name '*.sh' -exec chmod +x {} \\; && find . -perm -u+x -name '*.sh'"
 match_mode = "sorted"
 
 [[exercises.fixtures]]
