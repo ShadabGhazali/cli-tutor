@@ -35,17 +35,30 @@ Requires a terminal at least 80×24.
 
 ## Keys
 
+**Browsing (Intro / Examples views)**
+
 | Key | Action |
 |-----|--------|
 | `↑` `↓` | Switch module |
 | `Tab` | Intro → Examples → Exercises |
-| `n` `p` | Next / prev exercise |
-| `Enter` | Run command |
-| `h` | Hint |
-| `s` | Solution |
-| `f` | Show files |
-| `?` | Help |
+| `PgUp` `PgDn` | Scroll |
 | `q` | Quit |
+
+**Exercises**
+
+| Key | Action |
+|-----|--------|
+| `Enter` | Submit command |
+| `↑` `↓` | Scroll output |
+| `←` `→` | Move cursor |
+| `Ctrl+N` `Ctrl+P` | Next / prev exercise |
+| `Ctrl+T` | Hint |
+| `Ctrl+S` | Solution |
+| `Ctrl+F` | Show files |
+| `Ctrl+R` | Reset |
+| `Ctrl+L` | Clear output |
+| `Esc` | Back to browse |
+| `Ctrl+C` | Quit |
 
 Progress is saved to `~/.local/share/cli-tutor/progress.json`.
 
