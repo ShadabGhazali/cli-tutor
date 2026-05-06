@@ -6,9 +6,18 @@ Covers: `grep`, `awk`, `sed`, `find`, `xargs`, `cut`, `sort`, `uniq`, `tr` — ~
 
 ## Install
 
+**Homebrew (macOS/Linux)**
+```sh
+brew tap ShadabGhazali/cli-tutor
+brew install cli-tutor
+```
+
+**Cargo**
 ```sh
 cargo install cli-tutor
 ```
+
+Or grab a pre-built binary from [Releases](https://github.com/ShadabGhazali/cli-tutor/releases).
 
 ## Run from source
 

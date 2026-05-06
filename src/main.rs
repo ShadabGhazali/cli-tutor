@@ -18,6 +18,11 @@ use ratatui::{backend::CrosstermBackend, Terminal};
 use std::io;
 
 fn main() -> Result<()> {
+    if std::env::args().any(|a| a == "--version" || a == "-V") {
+        println!("cli-tutor {}", env!("CARGO_PKG_VERSION"));
+        return Ok(());
+    }
+
     let modules = content::load_modules();
     let mut app = App::new(modules);
 
