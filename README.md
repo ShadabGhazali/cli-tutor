@@ -1,8 +1,16 @@
 # cli-tutor
 
-A terminal app for learning Unix command-line tools by doing. Type real shell commands, get instant feedback.
+[![crates.io](https://img.shields.io/crates/v/cli-tutor.svg)](https://crates.io/crates/cli-tutor)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Covers: `grep`, `awk`, `sed`, `find`, `xargs`, `cut`, `sort`, `uniq`, `tr`, `wc`, `tar`, `chmod` — 83 exercises across beginner to advanced.
+Learn Unix command-line tools by typing real commands — not reading about them.
+
+Pick a tool, read the intro, try the examples, then solve exercises in a live shell.
+Each command you type is actually executed and checked against the expected output.
+
+![cli-tutor screenshot](assets/screenshot.png)
+
+---
 
 ## Install
 
@@ -16,27 +24,22 @@ brew install ShadabGhazali/cli-tutor/cli-tutor
 cargo install cli-tutor
 ```
 
-Or grab a pre-built binary from [Releases](https://github.com/ShadabGhazali/cli-tutor/releases).
+**Pre-built binaries** — grab the latest from [Releases](https://github.com/ShadabGhazali/cli-tutor/releases) (macOS Intel/ARM, Linux, Windows).
 
-## Update
+<details>
+<summary>Update an existing install</summary>
 
-**Homebrew**
 ```sh
+# Homebrew
 brew upgrade ShadabGhazali/cli-tutor/cli-tutor
-```
 
-**Cargo**
-```sh
+# Cargo
 cargo install cli-tutor --force
 ```
+</details>
 
-## Run from source
-
-```sh
-cargo run
-```
-
-Or build a release binary:
+<details>
+<summary>Build from source</summary>
 
 ```sh
 cargo build --release
@@ -44,8 +47,35 @@ cargo build --release
 ```
 
 Requires a terminal at least 80×24.
+</details>
+
+---
+
+## Modules
+
+| Tool | What it does | Exercises |
+|------|-------------|-----------|
+| `grep` | Search files for patterns | 12 |
+| `awk` | Field-based text processing and transformation | 10 |
+| `sed` | Stream editor — substitute, delete, insert lines | 10 |
+| `find` | Locate files by name, type, size, permissions | 9 |
+| `xargs` | Build and run commands from standard input | 6 |
+| `cut` | Extract fields and columns from text | 5 |
+| `sort` | Sort lines — alphabetically, numerically, by field | 6 |
+| `uniq` | Remove or count duplicate adjacent lines | 4 |
+| `tr` | Translate or delete individual characters | 4 |
+| `wc` | Count lines, words, and bytes in files | 6 |
+| `tar` | Create, list, and extract archive files | 5 |
+| `chmod` | Change file permissions | 6 |
+
+**83 exercises** — beginner to advanced. Progress is saved automatically.
+
+---
 
 ## Keys
+
+<details>
+<summary>Show all keybindings</summary>
 
 **Browsing (Intro / Examples views)**
 
@@ -94,6 +124,10 @@ Requires a terminal at least 80×24.
 | `?` | Toggle help |
 | `Ctrl+C` | Quit |
 
+</details>
+
+---
+
 ## CLI flags
 
 ```sh
@@ -102,7 +136,8 @@ cli-tutor --no-color
 cli-tutor --completions bash | zsh | fish
 ```
 
-To install shell completions:
+<details>
+<summary>Install shell completions</summary>
 
 ```sh
 # bash
@@ -114,8 +149,11 @@ cli-tutor --completions zsh > ~/.zsh/completions/_cli-tutor
 # fish
 cli-tutor --completions fish > ~/.config/fish/completions/cli-tutor.fish
 ```
+</details>
 
-## Config file
+---
+
+## Config
 
 Optional config at `~/.config/cli-tutor/config.toml` (respects `$XDG_CONFIG_HOME`):
 
@@ -128,9 +166,7 @@ default_module  = "grep"  # open on this module instead of the first in the list
 
 A missing or corrupt config file is silently ignored — defaults apply.
 
-## Progress
-
-Progress is saved to `~/.local/share/cli-tutor/progress.json` after each correct answer.
+---
 
 ## Stack
 
