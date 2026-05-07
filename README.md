@@ -173,4 +173,4 @@ A missing or corrupt config file is silently ignored — defaults apply.
 
 ## Stack
 
-Rust + [Ratatui](https://github.com/ratatui/ratatui) + Crossterm. Single binary, no runtime dependencies.
+[Rust](https://www.rust-lang.org) + [Ratatui](https://github.com/ratatui/ratatui) + [Crossterm](https://github.com/crossterm-rs/crossterm). Single binary, no runtime dependencies.
