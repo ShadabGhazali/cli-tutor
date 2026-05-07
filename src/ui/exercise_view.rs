@@ -159,15 +159,31 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
 
     // content_display.EXERCISE_VIEW.4,5 — output panel, scrollable
     let (output_text, output_style) = match app.submit_state {
-        SubmitState::Correct => (
-            "✓ Correct!\n".to_string()
-                + app
-                    .last_output
+        SubmitState::Correct => {
+            // timed_challenge.TIMER.4 — show solve time and best time on correct answer
+            let mut text = "✓ Correct!".to_string();
+            if app.config.timed_challenge {
+                if let Some(ms) = app.last_solve_ms {
+                    text.push_str(&format!("  (solved in {:.1}s)", ms as f64 / 1000.0));
+                }
+                if let (Some(ex), module_name) = (
+                    app.current_exercise_opt(),
+                    &app.current_module().module.name,
+                ) {
+                    if let Some(best_ms) = app.progress.best_time(module_name, &ex.id) {
+                        text.push_str(&format!("  Best: {:.1}s", best_ms as f64 / 1000.0));
+                    }
+                }
+            }
+            text.push('\n');
+            text.push_str(
+                app.last_output
                     .as_ref()
                     .map(|o| o.stdout.as_str())
                     .unwrap_or(""),
-            Style::default().fg(Color::Green),
-        ),
+            );
+            (text, Style::default().fg(Color::Green))
+        }
         SubmitState::Wrong => {
             let out = app.last_output.as_ref();
             let stdout = out.map(|o| o.stdout.as_str()).unwrap_or("");

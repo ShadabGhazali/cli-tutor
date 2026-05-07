@@ -8,7 +8,7 @@ use ratatui::{
 };
 
 pub fn render(_app: &App, frame: &mut Frame, area: Rect) {
-    let overlay = centered_rect(60, 70, area);
+    let overlay = centered_rect(62, 85, area);
     frame.render_widget(Clear, overlay);
 
     let lines = vec![
@@ -19,31 +19,42 @@ pub fn render(_app: &App, frame: &mut Frame, area: Rect) {
                 .fg(Color::Cyan),
         )),
         Line::from(""),
-        key_line("↑ / ↓", "Navigate module list (Intro/Examples views)"),
-        key_line("Tab / Esc", "Cycle views: Intro → Examples → Exercise"),
-        key_line("Enter", "Submit command"),
-        key_line("↑ / ↓", "Scroll output (Exercise view)"),
-        key_line("← / →", "Move cursor in input"),
-        Line::from(""),
         Line::from(Span::styled(
-            "  Exercise shortcuts (Ctrl+key)",
-            Style::default()
-                .fg(Color::Cyan)
-                .add_modifier(Modifier::BOLD),
+            "  Browsing (Intro / Examples)",
+            Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD),
         )),
         Line::from(""),
+        key_line("↑ / ↓", "Navigate module list"),
+        key_line("Tab", "Cycle views: Intro → Examples → Exercise → Free"),
+        key_line("PgUp / PgDn", "Scroll content"),
+        key_line("/", "Fuzzy search modules"),
+        key_line("d", "Cycle difficulty filter"),
+        key_line("P", "Progress summary"),
+        key_line("q", "Quit"),
+        Line::from(""),
+        Line::from(Span::styled(
+            "  Exercise view",
+            Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD),
+        )),
+        Line::from(""),
+        key_line("Enter", "Submit command"),
+        key_line("↑ / ↓", "Browse command history"),
+        key_line("PgUp / PgDn", "Scroll output"),
+        key_line("← / →", "Move cursor"),
+        key_line("Ctrl+← / →", "Jump by word"),
         key_line("Ctrl+N / Ctrl+P", "Next / previous exercise"),
         key_line("Ctrl+T", "Reveal next hint"),
         key_line("Ctrl+S", "Show/hide solution"),
         key_line("Ctrl+F", "Toggle file viewer"),
         key_line("Ctrl+R", "Reset exercise"),
-        key_line("Ctrl+L", "Clear output panel"),
+        key_line("Ctrl+L", "Clear output"),
+        key_line("Esc", "Back to browse"),
         Line::from(""),
-        key_line("q", "Quit (Intro/Examples)"),
         key_line("Ctrl+C", "Quit (anywhere)"),
+        key_line("P", "Progress summary (anywhere)"),
         Line::from(""),
         Line::from(Span::styled(
-            "Press Esc to close",
+            "Press Esc or ? to close",
             Style::default().fg(Color::DarkGray),
         )),
     ];
@@ -61,7 +72,7 @@ pub fn render(_app: &App, frame: &mut Frame, area: Rect) {
 fn key_line(key: &str, desc: &str) -> Line<'static> {
     Line::from(vec![
         Span::styled(
-            format!("  {:<15}", key),
+            format!("  {:<16}", key),
             Style::default()
                 .fg(Color::Yellow)
                 .add_modifier(Modifier::BOLD),

@@ -1,0 +1,33 @@
+feature:
+  name: paste_support
+  product: cli-tutor
+  description: >
+    Enables bracketed paste (crossterm EnableBracketedPaste) so that text pasted
+    from the system clipboard is received as a single Event::Paste rather than a
+    stream of individual keystrokes. Pasted characters are appended to the input
+    buffer after stripping control characters. Bracketed paste mode is enabled
+    only while Exercise view or Free Practice view is active, and disabled in
+    all other views.
+
+components:
+  INPUT:
+    name: Paste Input Handling
+    description: Enable/disable bracketed paste, event handling, and control character filtering
+    requirements:
+      1: crossterm::event::EnableBracketedPaste is sent to the terminal when the app enters Exercise view or Free Practice view
+      2: crossterm::event::DisableBracketedPaste is sent when the app leaves Exercise view or Free Practice view (including on app exit)
+      3: DisableBracketedPaste is always sent during terminal teardown regardless of which view is active, to leave the terminal in a clean state
+      4: Event::Paste(String) events are handled in handle_key / handle_event in app.rs
+      5: The paste string is inserted into the input buffer at the current cursor position (not necessarily at the end)
+      6: Control characters (Unicode code points < 0x20, plus DEL 0x7F) are removed from the paste string before insertion
+      7: Newline characters (0x0A, 0x0D) within a paste string are replaced with a single space so the single-line input invariant is maintained
+      8: After paste insertion the cursor is positioned after the last inserted character
+      9: Pasting into Intro, Examples, or any overlay view is a no-op — Event::Paste is silently discarded
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: The enable/disable calls are issued in the view-transition logic inside app.rs, not inside the ui/ rendering layer
+      2: No external crate is added; crossterm's built-in bracketed paste support is sufficient
+      3: The control-character filter is a pure function in app.rs (or a shared utility) with unit tests covering the boundary cases (0x00, 0x1F, 0x20, 0x7E, 0x7F)

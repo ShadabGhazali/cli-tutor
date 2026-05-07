@@ -19,6 +19,10 @@ const CUT_TOML: &str = include_str!("../../content/cut.toml");
 const SORT_TOML: &str = include_str!("../../content/sort.toml");
 const UNIQ_TOML: &str = include_str!("../../content/uniq.toml");
 const TR_TOML: &str = include_str!("../../content/tr.toml");
+// more_modules.CONTENT.1 — new modules
+const WC_TOML: &str = include_str!("../../content/wc.toml");
+const TAR_TOML: &str = include_str!("../../content/tar.toml");
+const CHMOD_TOML: &str = include_str!("../../content/chmod.toml");
 
 fn raw_by_name(name: &str) -> Option<&'static str> {
     match name {
@@ -31,6 +35,9 @@ fn raw_by_name(name: &str) -> Option<&'static str> {
         "sort" => Some(SORT_TOML),
         "uniq" => Some(UNIQ_TOML),
         "tr" => Some(TR_TOML),
+        "wc" => Some(WC_TOML),
+        "tar" => Some(TAR_TOML),
+        "chmod" => Some(CHMOD_TOML),
         _ => None,
     }
 }

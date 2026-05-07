@@ -1,0 +1,35 @@
+feature:
+  name: progress_summary
+  product: cli-tutor
+  description: >
+    Shift+P opens a full-screen overlay showing the user's overall learning
+    progress: one row per module with completion percentage, solved-unaided vs
+    solved-with-solution counts, and (when timed_challenge is enabled) the best
+    solve time recorded for each exercise. A totals row is shown at the bottom.
+    Pressing Shift+P again or Esc closes the overlay.
+
+components:
+  OVERLAY:
+    name: Progress Summary Overlay
+    description: Layout, data display, interaction, and conditional time column
+    requirements:
+      1: Shift+P toggles the progress summary overlay on and off from any view
+      2: While the overlay is visible all other key events except Shift+P and Esc are consumed by the overlay and do not affect the underlying app state
+      3: Esc closes the overlay without changing any app state
+      4: The overlay is rendered as a centered popup that covers the full terminal area (full-screen), with a titled border "Progress Summary"
+      5: Each loaded module occupies one row with columns: Module Name, Exercises Total, Solved (unaided), Solved (with solution), Completion %
+      6: Completion % is calculated as (unaided + with_solution) / total * 100, displayed as an integer (e.g. "75%")
+      7: A "Totals" row is appended after the last module row, summing all numeric columns and showing overall completion %
+      8: Rows are sorted alphabetically by module name
+      9: When timed_challenge feature is enabled (config flag), an additional "Best Time" column is shown per module, displaying the fastest correct solve time formatted as "m:ss.mmm"; if no timed solve exists for a module the cell shows "—"
+      10: When timed_challenge is disabled the Best Time column is hidden entirely — no empty column is rendered
+      11: The overlay is scrollable if the number of module rows exceeds the overlay height; Up/Down arrows scroll within the overlay
+      12: A scroll indicator is shown when the list overflows the visible area
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: The overlay reads directly from the in-memory progress HashMap — no disk I/O occurs at overlay open time
+      2: Overlay render logic lives in src/ui/progress_summary.rs; App state carries only a bool show_progress_summary toggle
+      3: Best-time data is sourced from the same progress.json structure used by timed_challenge — no separate data store

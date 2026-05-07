@@ -1,5 +1,5 @@
 use crate::app::{App, ContentView};
-use crate::ui::exercise_view;
+use crate::ui::{exercise_view, free_practice_view};
 use ratatui::{
     layout::Rect,
     style::{Color, Modifier, Style},
@@ -14,6 +14,8 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
         ContentView::Intro => render_intro(app, frame, area),
         ContentView::Examples => render_examples(app, frame, area),
         ContentView::Exercise => exercise_view::render(app, frame, area),
+        // free_practice.VIEW.1
+        ContentView::FreePractice => free_practice_view::render(app, frame, area),
     }
 }
 

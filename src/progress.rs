@@ -8,6 +8,9 @@ use std::path::PathBuf;
 pub struct ModuleProgress {
     pub completed: Vec<String>,
     pub attempted: Vec<String>,
+    // timed_challenge.TIMER.3 — best solve time per exercise (milliseconds)
+    #[serde(default)]
+    pub best_times: HashMap<String, u64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -71,6 +74,22 @@ impl Progress {
             .get(module)
             .map(|p| p.completed.iter().any(|id| id == exercise_id))
             .unwrap_or(false)
+    }
+
+    // timed_challenge.TIMER.3 — record best solve time; only keeps the fastest
+    pub fn record_time(&mut self, module: &str, exercise_id: &str, ms: u64) {
+        let entry = self.modules.entry(module.to_string()).or_default();
+        let best = entry.best_times.entry(exercise_id.to_string()).or_insert(u64::MAX);
+        if ms < *best {
+            *best = ms;
+        }
+    }
+
+    pub fn best_time(&self, module: &str, exercise_id: &str) -> Option<u64> {
+        self.modules
+            .get(module)
+            .and_then(|p| p.best_times.get(exercise_id).copied())
+            .filter(|&ms| ms < u64::MAX)
     }
 }
 

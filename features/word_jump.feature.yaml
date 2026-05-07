@@ -1,0 +1,30 @@
+feature:
+  name: word_jump
+  product: cli-tutor
+  description: >
+    Ctrl+Left and Ctrl+Right keyboard shortcuts move the cursor one word at a
+    time within the command input field, using standard shell word-boundary
+    semantics (whitespace-delimited tokens). Complements the existing
+    character-level Left/Right navigation already provided by text_input.
+
+components:
+  CURSOR:
+    name: Word-Jump Cursor Movement
+    description: Word boundary detection and cursor repositioning
+    requirements:
+      1: Ctrl+Right moves the cursor forward to the start of the next word; if already inside a word, moves to the character after that word's final character
+      2: Ctrl+Left moves the cursor backward to the start of the current or previous word (skipping leading whitespace first)
+      3: Words are delimited by ASCII whitespace (space, tab); all other characters are treated as word characters
+      4: Ctrl+Right at or beyond the last non-whitespace character moves the cursor to the end of the buffer (clamp, no wrap)
+      5: Ctrl+Left at or before the first non-whitespace character moves the cursor to position 0 (clamp, no wrap)
+      6: Both shortcuts are no-ops on an empty input buffer
+      7: Word-jump movement on a buffer consisting entirely of whitespace clamps to the appropriate end without error
+      8: After a word jump the visible horizontal scroll position is updated so the cursor remains in view (same rule as character-level cursor movement)
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Word-jump logic is implemented inside the existing input handling path in app.rs — no new file required
+      2: The algorithm must operate on the existing Vec<char> buffer representation; no temporary String allocation is permitted on the hot path
+      3: Key matching uses crossterm KeyCode::Left / KeyCode::Right with KeyModifiers::CONTROL

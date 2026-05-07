@@ -1,8 +1,9 @@
 use cli_tutor::app::{App, ContentView, SubmitState};
+use cli_tutor::config::Config;
 use cli_tutor::content::load_modules;
 
 fn make_app() -> App {
-    App::new(load_modules())
+    App::new(load_modules(), Config::default())
 }
 
 // --- Input editing ---
@@ -119,6 +120,9 @@ fn cycle_view_goes_intro_examples_exercise() {
     assert_eq!(app.current_view, ContentView::Examples);
     app.cycle_view();
     assert_eq!(app.current_view, ContentView::Exercise);
+    app.cycle_view();
+    // free_practice.VIEW.1 — FreePractice is 4th step in the cycle
+    assert_eq!(app.current_view, ContentView::FreePractice);
     app.cycle_view();
     assert_eq!(app.current_view, ContentView::Intro);
 }
@@ -313,9 +317,10 @@ fn scroll_down_increments() {
 // --- Module count sanity ---
 
 #[test]
-fn app_starts_with_nine_modules() {
+fn app_starts_with_twelve_modules() {
+    // more_modules.MODULES.1 — 12 modules total
     let app = make_app();
-    assert_eq!(app.modules.len(), 9);
+    assert_eq!(app.modules.len(), 12);
 }
 
 #[test]

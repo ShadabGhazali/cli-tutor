@@ -1,0 +1,33 @@
+feature:
+  name: timed_challenge
+  product: cli-tutor
+  description: >
+    An optional mode (enabled via config) that times how long the user takes to
+    solve each exercise. The timer starts on the first keystroke after an
+    exercise is presented and stops when the user submits a correct answer. The
+    best (fastest) time for each exercise is persisted in progress.json and
+    displayed in the output panel after a correct submission.
+
+components:
+  TIMER:
+    name: Exercise Timer
+    description: Start on first keystroke, stop on correct submit, persistence, and display
+    requirements:
+      1: The timer is only active when timed_challenge is set to true in the config file; when disabled none of the timing logic runs
+      2: The timer starts on the first printable keystroke after a new exercise is presented (i.e. after navigating to an exercise or after submitting a wrong answer that resets the prompt)
+      3: The timer does not start on non-character keys such as arrow keys, modifier-only presses, or hint/solution reveals
+      4: The timer stops and the elapsed duration is recorded when the matcher returns Correct for a submission
+      5: If the user navigates away from an exercise before submitting a correct answer, the in-progress timer is discarded — no partial time is stored
+      6: The elapsed time for the current attempt is displayed live in the exercise view header as "⏱ m:ss" while timing is active
+      7: After a correct submission the output panel displays "Time: m:ss.mmm" alongside the ✓ Correct! banner
+      8: The best time is updated in progress.json if and only if the new solve time is strictly less than the previously stored best time (or no best time exists yet)
+      9: Best time is stored per exercise id in the existing ModuleProgress structure — a new best_times: HashMap<String, Duration> (serialized as milliseconds u64) field is added
+      10: If the progress file contains a best_times entry for an exercise that no longer exists in the content, the orphaned entry is ignored and not written back
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: The timer uses std::time::Instant stored as an Option<Instant> field on App; None means not timing
+      2: The live display is updated on every terminal event (key or resize) — no separate tick loop is added; the displayed value may lag by up to one event cycle which is acceptable
+      3: Duration is serialized to progress.json as a u64 millisecond value to avoid floating-point serialization issues

@@ -1,0 +1,156 @@
+[module]
+name = "tar"
+description = "Create, list, and extract archive files"
+version = 1
+
+[intro]
+text = """
+## What is tar?
+
+`tar` (tape archive) bundles files into a single archive. Combined with `gzip`, it creates compressed archives — the standard `.tar.gz` format on Unix.
+
+## Basic Syntax
+
+```
+tar [OPTIONS] archive [files...]
+```
+
+## Common Flags
+
+- `-c` — create a new archive
+- `-x` — extract from an archive
+- `-t` — list contents of an archive
+- `-f archive` — specify the archive filename
+- `-z` — compress/decompress with gzip (.tar.gz)
+- `-v` — verbose (print filenames as processed)
+- `-C dir` — change to `dir` before extracting
+
+## Memory Aid
+
+**c**reate, e**x**tract, lis**t** — the three operations.
+`czf` = create gzipped, `tzf` = list gzipped, `xzf` = extract gzipped.
+"""
+
+[[examples]]
+title = "Create a compressed archive"
+description = "Bundle files into a .tar.gz archive"
+command = "tar czf backup.tar.gz file1.txt file2.txt"
+output = ""
+
+[[examples]]
+title = "List archive contents"
+description = "Show what is inside without extracting"
+command = "tar tzf backup.tar.gz"
+output = "file1.txt\nfile2.txt\n"
+
+[[examples]]
+title = "Extract an archive"
+description = "Unpack all files into the current directory"
+command = "tar xzf backup.tar.gz"
+output = ""
+
+[[exercises]]
+id = "tar.1"
+difficulty = "beginner"
+question = """Create a compressed archive named `backup.tar.gz` from `notes.txt` and `data.txt`.
+Then list the archive contents to verify both files are included."""
+expected_output = "notes.txt\ndata.txt\n"
+hints = [
+  "Use tar czf to create, then tar tzf to list",
+  "Try: tar czf backup.tar.gz notes.txt data.txt && tar tzf backup.tar.gz",
+]
+solution = "tar czf backup.tar.gz notes.txt data.txt && tar tzf backup.tar.gz"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "notes.txt"
+content = "some notes\n"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "some data\n"
+
+[[exercises]]
+id = "tar.2"
+difficulty = "beginner"
+question = """Archive the entire `src/` directory into `src.tar.gz`.
+Then list its contents to confirm both files are present (files only, not directories)."""
+expected_output = "src/main.rs\nsrc/lib.rs\n"
+hints = [
+  "Use tar czf to create, tar tzf to list, then grep -v to remove directory entries",
+  "Try: tar czf src.tar.gz src/ && tar tzf src.tar.gz | grep -v '/$'",
+]
+solution = "tar czf src.tar.gz src/ && tar tzf src.tar.gz | grep -v '/$'"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "src/main.rs"
+content = "fn main() {}\n"
+
+[[exercises.fixtures]]
+filename = "src/lib.rs"
+content = "pub fn lib() {}\n"
+
+[[exercises]]
+id = "tar.3"
+difficulty = "intermediate"
+question = """Create an archive `files.tar.gz` from `readme.txt`.
+Then extract it into a new subdirectory called `out/` and print the content of `out/readme.txt`."""
+expected_output = "Hello from readme\n"
+hints = [
+  "Use tar czf to create, mkdir out, then tar xzf -C out to extract",
+  "Try: tar czf files.tar.gz readme.txt && mkdir out && tar xzf files.tar.gz -C out && cat out/readme.txt",
+]
+solution = "tar czf files.tar.gz readme.txt && mkdir out && tar xzf files.tar.gz -C out && cat out/readme.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "readme.txt"
+content = "Hello from readme\n"
+
+[[exercises]]
+id = "tar.4"
+difficulty = "intermediate"
+question = """Create an archive `logs.tar.gz` from all three `.log` files.
+Then count how many files are inside the archive."""
+expected_output = "3\n"
+hints = [
+  "Use a glob to select .log files, then pipe tar tzf to wc -l",
+  "Try: tar czf logs.tar.gz *.log && tar tzf logs.tar.gz | wc -l | tr -d ' '",
+]
+solution = "tar czf logs.tar.gz *.log && tar tzf logs.tar.gz | wc -l | tr -d ' '"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "app.log"
+content = "log entry 1\n"
+
+[[exercises.fixtures]]
+filename = "error.log"
+content = "error entry\n"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "access entry\n"
+
+[[exercises]]
+id = "tar.5"
+difficulty = "advanced"
+question = """Create an archive `project.tar.gz` from the `src/` directory with verbose output.
+The verbose flag prints each filename as it is added.
+Show only the file paths (not directory entries) — one per line."""
+expected_output = "src/main.rs\nsrc/utils.rs\n"
+hints = [
+  "Use tar czvf, redirect stderr to stdout, strip BSD 'a ' prefix with sed, then filter to lines with '/'",
+  "Try: tar czvf project.tar.gz src/ 2>&1 | sed 's/^a //' | grep -v '/$' | grep '/'",
+]
+solution = "tar czvf project.tar.gz src/ 2>&1 | sed 's/^a //' | grep -v '/$' | grep '/'"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "src/main.rs"
+content = "fn main() {}\n"
+
+[[exercises.fixtures]]
+filename = "src/utils.rs"
+content = "pub fn util() {}\n"

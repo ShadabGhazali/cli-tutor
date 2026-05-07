@@ -1,0 +1,165 @@
+[module]
+name = "chmod"
+description = "Change file permissions"
+version = 1
+
+[intro]
+text = """
+## What is chmod?
+
+`chmod` (change mode) modifies the read/write/execute permissions of files and directories.
+
+## Permission Model
+
+Each file has three permission sets:
+- **u** — user (owner)
+- **g** — group
+- **o** — others (everyone else)
+- **a** — all three at once
+
+Each set has three bits:
+- **r** (read) = 4
+- **w** (write) = 2
+- **x** (execute) = 1
+
+## Symbolic vs Numeric
+
+**Symbolic:** `chmod u+x file` (add execute for user)
+**Numeric:** `chmod 755 file` (rwxr-xr-x — user=7, group=5, others=5)
+
+## Common Patterns
+
+- `chmod +x script.sh` — make executable
+- `chmod 644 file.txt` — owner read/write, group/others read-only
+- `chmod 755 dir/` — owner full access, group/others read+execute
+- `chmod -R g-w dir/` — remove group write recursively
+"""
+
+[[examples]]
+title = "Make a script executable"
+description = "Add execute permission for all users"
+command = "chmod +x deploy.sh && find . -name 'deploy.sh' -perm -u+x"
+output = "./deploy.sh\n"
+
+[[examples]]
+title = "Set numeric permissions"
+description = "Set rw-r--r-- (owner read+write, others read-only)"
+command = "chmod 644 config.txt && find . -name 'config.txt' -perm 644"
+output = "./config.txt\n"
+
+[[exercises]]
+id = "chmod.1"
+difficulty = "beginner"
+question = """The file `script.sh` exists but is not executable.
+Make it executable by the owner and verify using find."""
+expected_output = "./script.sh\n"
+hints = [
+  "Use chmod +x to add execute permission",
+  "Verify with: find . -name 'script.sh' -perm -u+x",
+  "Try: chmod +x script.sh && find . -name 'script.sh' -perm -u+x",
+]
+solution = "chmod +x script.sh && find . -name 'script.sh' -perm -u+x"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "script.sh"
+content = "#!/bin/sh\necho hello\n"
+
+[[exercises]]
+id = "chmod.2"
+difficulty = "beginner"
+question = """The file `config.txt` currently has wide-open permissions.
+Set it to 644 (owner read+write, everyone else read-only) and verify."""
+expected_output = "./config.txt\n"
+hints = [
+  "Use numeric mode: chmod 644",
+  "Verify with: find . -name 'config.txt' -perm 644",
+  "Try: chmod 644 config.txt && find . -name 'config.txt' -perm 644",
+]
+solution = "chmod 644 config.txt && find . -name 'config.txt' -perm 644"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "config.txt"
+content = "key=value\n"
+
+[[exercises]]
+id = "chmod.3"
+difficulty = "beginner"
+question = """The file `secret.txt` should be readable and writable only by the owner (mode 600).
+Set it and verify."""
+expected_output = "./secret.txt\n"
+hints = [
+  "Mode 600 = rw------- (owner read+write, no access for group/others)",
+  "Try: chmod 600 secret.txt && find . -name 'secret.txt' -perm 600",
+]
+solution = "chmod 600 secret.txt && find . -name 'secret.txt' -perm 600"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "secret.txt"
+content = "password=hunter2\n"
+
+[[exercises]]
+id = "chmod.4"
+difficulty = "intermediate"
+question = """All three `.sh` files in the current directory need to be executable.
+Make them all executable in one command and verify by listing them with find."""
+expected_output = "./build.sh\n./deploy.sh\n./test.sh\n"
+hints = [
+  "Use a glob with chmod, then find -perm -u+x",
+  "Try: chmod +x *.sh && find . -name '*.sh' -perm -u+x",
+]
+solution = "chmod +x *.sh && find . -name '*.sh' -perm -u+x"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "build.sh"
+content = "#!/bin/sh\necho build\n"
+
+[[exercises.fixtures]]
+filename = "deploy.sh"
+content = "#!/bin/sh\necho deploy\n"
+
+[[exercises.fixtures]]
+filename = "test.sh"
+content = "#!/bin/sh\necho test\n"
+
+[[exercises]]
+id = "chmod.5"
+difficulty = "intermediate"
+question = """The directory `private/` and everything inside it should deny access to group and others.
+Use chmod -R to set mode 700 recursively and verify the directory itself."""
+expected_output = "./private\n"
+hints = [
+  "Use chmod -R 700 to set permissions recursively",
+  "Verify with: find . -name 'private' -perm 700 -type d",
+  "Try: chmod -R 700 private && find . -name 'private' -perm 700 -type d",
+]
+solution = "chmod -R 700 private && find . -name 'private' -perm 700 -type d"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "private/notes.txt"
+content = "secret notes\n"
+
+[[exercises.fixtures]]
+filename = "private/data.txt"
+content = "secret data\n"
+
+[[exercises]]
+id = "chmod.6"
+difficulty = "advanced"
+question = """The file `shared.txt` should allow the owner to read and write, the group to read only, and deny all access to others (mode 640).
+Set permissions and verify."""
+expected_output = "./shared.txt\n"
+hints = [
+  "Mode 640 = rw-r----- (user=6, group=4, others=0)",
+  "Try: chmod 640 shared.txt && find . -name 'shared.txt' -perm 640",
+]
+solution = "chmod 640 shared.txt && find . -name 'shared.txt' -perm 640"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "shared.txt"
+content = "shared content\n"

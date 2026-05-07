@@ -1,0 +1,35 @@
+feature:
+  name: config_file
+  product: cli-tutor
+  description: >
+    Loads a TOML configuration file from ~/.config/cli-tutor/config.toml at
+    startup (before the TUI is initialised). Supports XDG_CONFIG_HOME override.
+    Recognised fields: no_color, default_module, skip_completed, timed_challenge.
+    A missing file produces default values with no error. A corrupt or
+    unparseable file emits a warning to stderr and falls back to defaults.
+
+components:
+  CONFIG:
+    name: Configuration File Loading
+    description: File location, schema, startup loading, graceful fallback, and XDG support
+    requirements:
+      1: The config file is read from $XDG_CONFIG_HOME/cli-tutor/config.toml when XDG_CONFIG_HOME is set and non-empty, otherwise from ~/.config/cli-tutor/config.toml
+      2: If the config file does not exist, all config fields take their default values and no error or warning is emitted
+      3: If the config file exists but cannot be parsed as valid TOML, a warning message is printed to stderr ("Warning: config file could not be parsed, using defaults") and all fields take their default values
+      4: If the config file is valid TOML but contains unrecognised fields, those fields are silently ignored (use serde's default + deny_unknown_fields = false behaviour)
+      5: The no_color field is a boolean, default false; when true it activates the same no-color mode as the --no-color CLI flag
+      6: The default_module field is an optional string matching a module name (e.g. "grep"); when set, the app opens with that module pre-selected instead of the first in the list; if the name does not match any loaded module the field is ignored with a warning
+      7: The skip_completed field is a boolean, default false; when true, exercise navigation automatically skips exercises whose progress entry shows a correct solve
+      8: The timed_challenge field is a boolean, default false; when true it enables the timed_challenge feature for all exercise sessions
+      9: CLI flags (--no-color) override config file values — the final resolved config is computed once after both sources are read, with CLI taking precedence
+      10: The resolved configuration is stored in an immutable AppConfig struct on App and is never modified after startup
+      11: A unit test verifies that a missing config file produces default AppConfig values without panicking
+      12: A unit test verifies that a corrupt config file (invalid TOML) produces default AppConfig values and does not panic
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Config loading lives in src/config.rs; it exposes a single public function load_config() -> AppConfig that handles file discovery, parsing, and fallback
+      2: AppConfig derives Clone, Debug, and PartialEq; all fields have serde default attributes so partial TOML files deserialize correctly
+      3: No external config-management crate is added; toml crate (already a dependency) is used for deserialization directly into AppConfig

@@ -1,0 +1,31 @@
+feature:
+  name: shell_completions
+  product: cli-tutor
+  description: >
+    The `--completions <shell>` CLI flag prints a shell completion script for the
+    specified shell to stdout and exits with code 0, before any terminal
+    initialisation (crossterm raw mode, alternate screen) takes place. Supported
+    shells are bash, zsh, and fish.
+
+components:
+  CLI:
+    name: Shell Completion Script Generation
+    description: Flag parsing, per-shell script output, and early exit
+    requirements:
+      1: The binary accepts `--completions <shell>` where <shell> is one of: bash, zsh, fish (case-insensitive)
+      2: When `--completions` is present, the completion script is printed to stdout and the process exits with code 0 immediately — no terminal setup occurs
+      3: If an unrecognised shell name is provided, a human-readable error message is printed to stderr and the process exits with code 1
+      4: If `--completions` is provided without a shell argument, a human-readable error is printed to stderr and the process exits with code 1
+      5: The bash completion script handles completion for all defined CLI flags (--no-color, --completions, --help) and the shell names as arguments to --completions
+      6: The zsh completion script is a well-formed _cli-tutor compdef function that completes the same flags and arguments as the bash script
+      7: The fish completion script uses `complete -c cli-tutor` directives to complete the same flags and arguments
+      8: Each generated script is a static string embedded in the binary (not generated dynamically at runtime) — no external crate such as clap_complete is required
+      9: The output ends with a trailing newline so it can be eval'd or sourced directly without modification
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: CLI argument parsing for --completions and --no-color is done with a minimal hand-rolled parser using std::env::args() — no clap or structopt dependency is added
+      2: The completion script strings are defined as const &str values in main.rs or a dedicated src/completions.rs module
+      3: The early-exit path is the first thing checked in main() before terminal::enable_raw_mode or any other side-effecting call

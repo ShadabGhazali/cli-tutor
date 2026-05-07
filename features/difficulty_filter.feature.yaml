@@ -1,0 +1,33 @@
+feature:
+  name: difficulty_filter
+  product: cli-tutor
+  description: >
+    Pressing `d` in Exercise view cycles through a difficulty filter:
+    None → Beginner → Intermediate → Advanced → None. When a filter is active,
+    the next/previous exercise navigation (n/p and Left/Right) skips exercises
+    that do not match the selected difficulty. An indicator in the content pane
+    header shows the active filter. The filter resets to None when the user
+    switches to a different module.
+
+components:
+  FILTER:
+    name: Difficulty Filter
+    description: Filter cycling, exercise skipping, header indicator, and reset behaviour
+    requirements:
+      1: Pressing `d` in Exercise view advances the difficulty filter through the cycle None → Beginner → Intermediate → Advanced → None
+      2: The current filter level is displayed in the content pane header, e.g. "[Filter: Beginner]"; when the filter is None the indicator is hidden
+      3: When a filter is active, pressing `n` or Right arrow skips forward past any exercises whose difficulty does not match, stopping at the next matching exercise
+      4: When a filter is active, pressing `p` or Left arrow skips backward past any exercises whose difficulty does not match, stopping at the previous matching exercise
+      5: If no exercises in the module match the active filter, a message "No exercises match this difficulty" is shown in the exercise area and navigation keys are no-ops
+      6: When navigating to a new module (module list selection changes), the difficulty filter resets to None
+      7: The filter operates on the difficulty field defined in the exercise TOML; valid values are beginner, intermediate, advanced
+      8: `d` is a no-op in Intro, Examples, and Free Practice views — the filter only applies to Exercise view
+      9: The exercise position indicator ("Exercise N / Total") reflects only exercises matching the current filter when a filter is active (e.g. "Exercise 2 / 4 [Beginner]")
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Filter state is stored as an Option<Difficulty> field on App; Difficulty is an existing enum derived from the content types
+      2: Skipping logic is a helper function that walks the exercise list from the current index and returns the next/previous matching index — it must not mutate state; only App::handle_key calls it
+      3: Filter reset on module switch is handled in the same code path that resets the exercise index

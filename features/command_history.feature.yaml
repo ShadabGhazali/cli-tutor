@@ -1,0 +1,32 @@
+feature:
+  name: command_history
+  product: cli-tutor
+  description: >
+    Up/Down arrow keys in Exercise view and Free Practice view cycle through the
+    list of previously submitted commands for that session, matching standard
+    readline / shell history UX. The first keystroke after browsing history
+    restores any unsaved draft the user had typed before navigating into history.
+
+components:
+  HISTORY:
+    name: Command History Navigation
+    description: Recording, cycling, and draft-restore behaviour
+    requirements:
+      1: Every non-empty command string is appended to the in-memory history list on successful submission (Enter pressed)
+      2: Consecutive duplicate entries are not added — if the new submission is identical to the most-recent history entry, it is silently dropped
+      3: Up arrow moves backward through history (most-recent first); the input field is replaced with the recalled entry
+      4: Down arrow moves forward through history toward the present; at the newest entry Down arrow restores the saved draft
+      5: The "draft" is the buffer content that existed before the user first pressed Up to enter history navigation mode
+      6: If the draft is empty and the user returns to the present position via Down, the input field is cleared
+      7: Any keystroke that modifies the buffer (printable char, Backspace, Ctrl+W, Ctrl+U) while in history navigation mode exits history mode and the current buffer becomes the new draft, discarding the recalled entry
+      8: History is per-session only — it is not persisted to disk and is reset on app restart
+      9: History navigation is active only in Exercise view and Free Practice view; in Intro and Examples views Up/Down retain their scroll behaviour
+      10: There is no hard cap on history size for v1.0 (bounded only by available memory)
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: History is stored as a Vec<String> in the App struct; a separate usize field tracks the current history navigation index (None means not in history mode)
+      2: Draft is stored as an Option<Vec<char>> field on App; set when entering history mode, cleared when exiting
+      3: History state (index, draft) is reset to default when the user switches modules or views

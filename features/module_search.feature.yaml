@@ -1,0 +1,35 @@
+feature:
+  name: module_search
+  product: cli-tutor
+  description: >
+    Pressing `/` from any view activates a search bar rendered above the module
+    list in the left panel. Typing immediately filters the visible module list to
+    entries whose names contain the query string (case-insensitive). Esc cancels
+    search and restores the full list. Enter selects the first visible match and
+    returns to normal navigation mode.
+
+components:
+  SEARCH:
+    name: Module Search Bar
+    description: Activation, filtering, navigation, and cancellation
+    requirements:
+      1: Pressing `/` when not already in search mode activates search mode; a search bar is rendered above the module list
+      2: The search bar displays a `/` prompt prefix followed by the typed query and a blinking cursor
+      3: All printable ASCII characters typed while in search mode are appended to the query string
+      4: Backspace removes the last character from the query; if the query becomes empty the full module list is shown but search mode remains active
+      5: Filtering is case-insensitive substring matching against the module name field
+      6: The filtered list updates on every keystroke with no debounce delay
+      7: If no modules match the query the list area shows a "No results" placeholder
+      8: Up/Down arrow keys while in search mode move the selection highlight within the filtered list
+      9: Enter while in search mode selects the currently highlighted module (or the first visible match if nothing is highlighted), exits search mode, and switches the content pane to that module
+      10: Esc cancels search mode, clears the query, restores the full module list, and returns the selection highlight to the previously selected module
+      11: Pressing `/` while search mode is already active is a no-op (does not nest or reset)
+      12: Search mode is exited automatically if the user switches to a different view via Tab or Shift+Tab
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Search query is stored as a String field on App; a bool field (search_active) tracks mode
+      2: The filtered module list is computed at draw time in the ui/ layer — App stores only the raw query, never the filtered list
+      3: No external fuzzy-matching crate is used; std str::contains (after to_lowercase) is sufficient

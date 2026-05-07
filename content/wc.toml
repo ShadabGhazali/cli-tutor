@@ -1,0 +1,155 @@
+[module]
+name = "wc"
+description = "Count lines, words, and characters in files"
+version = 1
+
+[intro]
+text = """
+## What is wc?
+
+`wc` (word count) counts lines, words, and bytes/characters in files or standard input.
+
+## Basic Syntax
+
+```
+wc [OPTIONS] [FILE...]
+```
+
+## Common Flags
+
+- `-l` — count lines only
+- `-w` — count words only
+- `-c` — count bytes
+- `-m` — count characters (respects multibyte/UTF-8)
+- (no flag) — print lines, words, and bytes together
+
+## Tips
+
+- `wc -l < file.txt` — redirect instead of passing filename suppresses the filename in output
+- Pipe output through `tr -d ' '` to strip leading spaces (BSD `wc` adds them)
+- `wc` is useful in pipelines: `grep 'error' log.txt | wc -l`
+"""
+
+[[examples]]
+title = "Count lines"
+description = "Print the number of lines in a file"
+command = "wc -l < notes.txt"
+output = "3\n"
+
+[[examples]]
+title = "Count words"
+description = "Print the number of words in a file"
+command = "wc -w < notes.txt"
+output = "9\n"
+
+[[examples]]
+title = "Count in a pipeline"
+description = "Count how many error lines are in a log file"
+command = "grep 'ERROR' app.log | wc -l | tr -d ' '"
+output = "2\n"
+
+[[exercises]]
+id = "wc.1"
+difficulty = "beginner"
+question = """The file `words.txt` has one word per line.
+Count the number of lines in it."""
+expected_output = "5\n"
+hints = [
+  "Use wc -l with input redirection to suppress the filename",
+  "Try: wc -l < words.txt | tr -d ' '",
+]
+solution = "wc -l < words.txt | tr -d ' '"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "words.txt"
+content = "apple\nbanana\ncherry\ndate\nelderberry\n"
+
+[[exercises]]
+id = "wc.2"
+difficulty = "beginner"
+question = """The file `sentence.txt` contains a sentence.
+Count the number of words in it."""
+expected_output = "6\n"
+hints = [
+  "Use wc -w with input redirection",
+  "Try: wc -w < sentence.txt | tr -d ' '",
+]
+solution = "wc -w < sentence.txt | tr -d ' '"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "sentence.txt"
+content = "the quick brown fox jumps high\n"
+
+[[exercises]]
+id = "wc.3"
+difficulty = "beginner"
+question = """The file `log.txt` has log entries.
+Count only the lines that contain the word 'ERROR'."""
+expected_output = "3\n"
+hints = [
+  "Pipe grep output into wc -l",
+  "Try: grep 'ERROR' log.txt | wc -l | tr -d ' '",
+]
+solution = "grep 'ERROR' log.txt | wc -l | tr -d ' '"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "log.txt"
+content = "INFO: started\nERROR: disk full\nINFO: ok\nERROR: timeout\nWARN: slow\nERROR: crash\n"
+
+[[exercises]]
+id = "wc.4"
+difficulty = "intermediate"
+question = """The file `data.txt` has text.
+Print the number of words and the number of lines, separated by a space, in that order."""
+expected_output = "8 4\n"
+hints = [
+  "Run wc with both -w and -l flags and use awk to reformat",
+  "Try: wc -wl < data.txt | awk '{print $2, $1}'",
+]
+solution = "wc -wl < data.txt | awk '{print $2, $1}'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "one two\nthree four\nfive six\nseven eight\n"
+
+[[exercises]]
+id = "wc.5"
+difficulty = "intermediate"
+question = """The directory has two text files: `a.txt` (3 lines) and `b.txt` (5 lines).
+Find the total number of lines across all .txt files using find and xargs."""
+expected_output = "8\n"
+hints = [
+  "Pipe find output into xargs wc -l, then extract the total line",
+  "Try: find . -name '*.txt' | xargs wc -l | tail -1 | awk '{print $1}' | tr -d ' '",
+]
+solution = "find . -name '*.txt' | xargs wc -l | tail -1 | awk '{print $1}' | tr -d ' '"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "a.txt"
+content = "line1\nline2\nline3\n"
+
+[[exercises.fixtures]]
+filename = "b.txt"
+content = "line1\nline2\nline3\nline4\nline5\n"
+
+[[exercises]]
+id = "wc.6"
+difficulty = "advanced"
+question = """The file `data.txt` has text spread across three lines with three words each.
+Print three numbers on one line: line count, word count, byte count (space-separated)."""
+expected_output = "3 9 18\n"
+hints = [
+  "wc with no flags prints all three counts; use awk to strip the filename",
+  "Try: wc < data.txt | awk '{print $1, $2, $3}'",
+]
+solution = "wc < data.txt | awk '{print $1, $2, $3}'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "data.txt"
+content = "a b c\nd e f\ng h i\n"

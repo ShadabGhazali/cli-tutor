@@ -1,0 +1,35 @@
+feature:
+  name: free_practice
+  product: cli-tutor
+  description: >
+    A fourth content view — Free Practice — inserted into the Tab cycle after
+    Exercises (Intro → Examples → Exercises → Free Practice → Intro). Lets the
+    user run arbitrary shell commands against the current module's fixture
+    directory with no expected-output matching. Output is displayed verbatim.
+    Command history from the exercise view is shared with free practice.
+
+components:
+  VIEW:
+    name: Free Practice View
+    description: Navigation, command execution, output display, and history integration
+    requirements:
+      1: Tab from Exercise view cycles to Free Practice view; Tab from Free Practice view cycles back to Intro view
+      2: Shift+Tab from Intro view cycles to Free Practice view (reverse cycle)
+      3: The active tab label "Free Practice" is highlighted in the content pane header when this view is active
+      4: The view renders an input bar identical to the Exercise view input bar, prefixed with "$ "
+      5: Submitted commands are executed via the same executor path as exercise commands — `sh -c`, fixture dir as cwd, 3-second timeout, minimal env
+      6: The fixture directory used is the same one set up for the currently selected module (the module's default fixtures are written on module switch, same as for exercises)
+      7: There is no expected-output comparison — every execution that completes without timeout is considered neutral (no ✓/✗ banner)
+      8: On timeout the output panel shows the same "Command timed out (3s)" message as in Exercise view
+      9: stdout and stderr are both displayed in the output panel, stderr rendered in a distinct style (e.g. dimmed or yellow)
+      10: Command history is shared with the Exercise view for the same module — commands submitted in Free Practice appear in history navigable from Exercise view and vice versa
+      11: Pressing `r` in Free Practice view re-writes the fixture directory to its initial state (same as in Exercise view), useful after the user has modified files
+      12: The view does not display hints, solution, attempt count, or expected output — those elements are hidden
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Free Practice view is represented as a new variant in the existing ContentView enum in app.rs
+      2: No separate executor code path is introduced — free_practice reuses executor::execute with a None expected_output sentinel or equivalent
+      3: The output panel in free practice is the same widget as in exercise view; only the feedback banner logic is gated on view type

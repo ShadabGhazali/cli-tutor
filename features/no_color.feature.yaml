@@ -1,0 +1,37 @@
+feature:
+  name: no_color
+  product: cli-tutor
+  description: >
+    Provides a no-color mode that strips all foreground and background color
+    styling from TUI rendering, leaving only structural formatting (bold,
+    underline). Can be activated via the `--no-color` CLI flag or the
+    `no_color = true` field in the config file. The NO_COLOR environment variable
+    (https://no-color.org) is also honoured.
+
+components:
+  CLI:
+    name: CLI Flag Parsing
+    description: Command-line interface entry point for no-color mode
+    requirements:
+      1: The binary accepts a `--no-color` flag (long form only) as a command-line argument
+      2: When `--no-color` is present, no_color mode is enabled before any terminal initialisation occurs
+      3: The NO_COLOR environment variable (any non-empty value) activates no_color mode with the same effect as the flag
+      4: `--no-color` from the CLI takes precedence over a `no_color = false` value in the config file; the flag can only enable, not disable, what the env var or config already set
+
+  DISPLAY:
+    name: Style Stripping in UI
+    description: Removing color attributes from Ratatui styles when no_color is active
+    requirements:
+      1: When no_color mode is active, all Ratatui Style values emitted by the ui/ layer have their fg and bg fields set to Color::Reset
+      2: Bold, italic, underline, and dim modifiers are preserved — only color attributes are stripped
+      3: A single helper function `strip_color(style: Style) -> Style` in the ui/ layer applies the stripping; all rendering code calls this helper rather than constructing styles inline
+      4: The no_color flag value is passed to rendering functions via a field on App (or a dedicated RenderConfig struct) — never read from an environment variable at draw time
+      5: Correctness/error status indicators (✓ green, ✗ red, ⚠ yellow) fall back to bold text only when no_color is active so they remain distinguishable without relying on color
+      6: A manual smoke test confirms that the full TUI renders without color artifacts when launched with `--no-color`
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: No external crate is added for color detection; env var and flag parsing are done with std::env
+      2: The no_color field is a bool stored on the App struct and set once at startup — it is never toggled at runtime

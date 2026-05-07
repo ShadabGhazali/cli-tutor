@@ -1,0 +1,34 @@
+feature:
+  name: more_modules
+  product: cli-tutor
+  description: >
+    Adds three new command modules — wc, tar, and chmod — bringing the total
+    bundled module count from 9 to 12. Each module follows the existing TOML
+    content schema (intro, examples, exercises with fixtures). All exercises must
+    be solvable using standard POSIX tools available on macOS and common Linux
+    distros, and must pass the automated solution test suite.
+
+components:
+  CONTENT:
+    name: Module Content and Schema Compliance
+    description: Module schema correctness, exercise minimums, solution portability, and fixture safety
+    requirements:
+      1: Each new module (wc, tar, chmod) has a corresponding TOML file at content/<module>.toml embedded via include_str!() or rust-embed at compile time
+      2: Each module's TOML validates successfully against the existing content schema — all required fields (id, prompt, expected_output, match_mode, difficulty, hints) are present on every exercise
+      3: The wc module contains at least 6 exercises covering line count (-l), word count (-w), byte/char count (-c/-m), combined flags, and counting across multiple files
+      4: The tar module contains at least 6 exercises covering archive creation (-cf), extraction (-xf), listing contents (-tf), compressed archives (-czf / -xzf), and path stripping (--strip-components)
+      5: The chmod module contains at least 6 exercises covering symbolic mode (u+x, g-w, o=r), octal mode (755, 644), recursive chmod (-R), and reading permissions with ls -l
+      6: Every exercise id follows the pattern <module>.<n> (e.g. wc.1, tar.3, chmod.6) and is globally unique across all modules
+      7: Fixture filenames used in the new modules must not contain path separators and must not conflict with fixture names used in existing modules
+      8: All expected_output values in new exercises are verified against at least one reference solution that runs correctly in the CI environment
+      9: match_mode values are chosen conservatively — prefer normalized over exact when output may vary by trailing whitespace; prefer sorted when output order is not guaranteed
+      10: Each new module includes an intro text section and at least 3 annotated examples in the examples section before the exercises
+      11: A smoke test deserializes all 12 bundled TOML files and asserts that each module contains at least 1 exercise — the existing smoke test must be updated to include the 3 new modules
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: No new Rust source files are required — only new TOML content files and an update to the module registry in src/content/
+      2: tar exercises must not assume GNU tar extensions unavailable on macOS's BSD tar; use flags compatible with both implementations
+      3: chmod exercises must use fixture files (not system files) and must clean up after themselves via the temp dir mechanism already in place
