@@ -1,8 +1,8 @@
 class CliTutor < Formula
   desc "Interactive terminal app for learning Unix command-line tools"
   homepage "https://github.com/ShadabGhazali/cli-tutor"
-  url "https://github.com/ShadabGhazali/cli-tutor/archive/refs/tags/v0.2.0.tar.gz"
-  sha256 "85326810f609c2bc6e9435cb79d094bcdbc620126ebde42509b84aee6db302f9"
+  url "https://github.com/ShadabGhazali/cli-tutor/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "cc308b31fa2ba3dae615894fd25c69051b4cbaf5b8776aa782155796d8dc1b32"
   license "MIT"
 
   depends_on "rust" => :build
