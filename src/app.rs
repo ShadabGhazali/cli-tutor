@@ -2,7 +2,7 @@ use crate::config::Config;
 use crate::content::types::{Difficulty, Exercise, ModuleFile};
 use crate::executor::{ExecutionResult, Executor};
 use crate::matcher::Matcher;
-use crate::progress::{ModuleProgress, Progress};
+use crate::progress::{ModuleProgress, Progress, Stats};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContentView {
@@ -63,6 +63,8 @@ pub struct App {
     pub output_scroll: u16,
 
     pub progress: Progress,
+    // gamification.PERSIST.1 — stats live separately from per-module progress
+    pub stats: Stats,
     pub should_quit: bool,
 
     // config_file.CONFIG.3
@@ -92,6 +94,7 @@ pub struct App {
 impl App {
     pub fn new(modules: Vec<ModuleFile>, config: Config) -> Self {
         let progress = Progress::load();
+        let stats = Stats::load();
 
         // config_file.CONFIG.2 — jump to default_module if configured
         let selected_module = config
@@ -117,6 +120,7 @@ impl App {
             examples_scroll: 0,
             output_scroll: 0,
             progress,
+            stats,
             should_quit: false,
             config,
             command_history: Vec::new(),
@@ -553,6 +557,8 @@ impl App {
             self.submit_state = SubmitState::Error;
         } else if correct {
             self.submit_state = SubmitState::Correct;
+            // gamification.XP.2 — only award XP on the first correct solve
+            let already_completed = self.progress.is_completed(&module_name, &exercise.id);
             self.progress.mark_completed(&module_name, &exercise.id);
 
             // timed_challenge.TIMER.2 — stop timer and record best time
@@ -562,6 +568,18 @@ impl App {
                     self.last_solve_ms = Some(ms);
                     self.progress.record_time(&module_name, &exercise.id, ms);
                 }
+            }
+
+            // gamification.XP.1 — award XP based on difficulty, first solve only
+            if !already_completed {
+                let xp: u64 = match exercise.difficulty {
+                    Difficulty::Beginner => 10,
+                    Difficulty::Intermediate => 20,
+                    Difficulty::Advanced => 30,
+                };
+                self.stats.add_xp(xp);
+                self.stats.update_streak();
+                let _ = self.stats.save();
             }
 
             let _ = self.progress.save();

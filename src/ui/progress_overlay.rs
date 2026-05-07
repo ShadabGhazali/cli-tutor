@@ -15,6 +15,17 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let nc = app.config.no_color;
 
     // progress_summary.OVERLAY.2 — per-module rows
+    // gamification.XP.4 / gamification.STREAK.5 — show XP and streak above module table
+    let streak_label = if app.stats.streak_days == 1 {
+        "day".to_string()
+    } else {
+        "days".to_string()
+    };
+    let xp_streak = format!(
+        "XP: {}   Streak: {} {}",
+        app.stats.total_xp, app.stats.streak_days, streak_label
+    );
+
     let mut lines: Vec<Line<'static>> = vec![
         Line::from(Span::styled(
             "Progress Summary",
@@ -24,6 +35,10 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
                     .add_modifier(Modifier::BOLD),
                 nc,
             ),
+        )),
+        Line::from(Span::styled(
+            xp_streak,
+            crate::ui::s(Style::default().fg(Color::Yellow), nc),
         )),
         Line::from(""),
     ];

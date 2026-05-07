@@ -93,6 +93,93 @@ impl Progress {
     }
 }
 
+// gamification.PERSIST.1 — global stats stored separately from per-module progress
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct Stats {
+    #[serde(default)]
+    pub total_xp: u64,
+    #[serde(default)]
+    pub streak_days: u32,
+    // gamification.STREAK.6 — Unix epoch day number (secs / 86400)
+    #[serde(default)]
+    pub last_active_day: Option<u64>,
+}
+
+impl Stats {
+    pub fn load() -> Self {
+        match Self::try_load() {
+            Ok(s) => s,
+            Err(e) => {
+                // gamification.PERSIST.3 — warn and use defaults on corrupt file
+                eprintln!("Warning: could not load stats file: {e}. Starting fresh.");
+                Self::default()
+            }
+        }
+    }
+
+    fn try_load() -> Result<Self> {
+        let path = stats_path()?;
+        if !path.exists() {
+            // gamification.PERSIST.2 — missing file → silent defaults
+            return Ok(Self::default());
+        }
+        let content = fs::read_to_string(&path)?;
+        let s: Self = serde_json::from_str(&content)?;
+        Ok(s)
+    }
+
+    pub fn save(&self) -> Result<()> {
+        let path = stats_path()?;
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let json = serde_json::to_string_pretty(self)?;
+        fs::write(&path, json)?;
+        Ok(())
+    }
+
+    // gamification.XP.1 — caller passes the computed xp amount (no content-type dependency)
+    pub fn add_xp(&mut self, xp: u64) {
+        self.total_xp += xp;
+    }
+
+    // gamification.STREAK.1-4 — update streak based on today vs last active day
+    pub fn update_streak(&mut self) {
+        let today = today_day();
+        match self.last_active_day {
+            None => {
+                self.streak_days = 1;
+            }
+            Some(last) if last == today => {
+                // already active today — no change
+            }
+            Some(last) if today > 0 && last == today - 1 => {
+                // consecutive day — extend streak
+                self.streak_days += 1;
+            }
+            _ => {
+                // gap or future date — reset streak
+                self.streak_days = 1;
+            }
+        }
+        self.last_active_day = Some(today);
+    }
+}
+
+fn today_day() -> u64 {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+        / 86400
+}
+
+fn stats_path() -> Result<PathBuf> {
+    let base = dirs_base()?;
+    Ok(base.join("cli-tutor").join("stats.json"))
+}
+
 fn progress_path() -> Result<PathBuf> {
     let base = dirs_base()?;
     Ok(base.join("cli-tutor").join("progress.json"))

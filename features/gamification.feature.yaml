@@ -1,0 +1,49 @@
+feature:
+  name: gamification
+  product: cli-tutor
+  description: >
+    Awards XP points for first-time correct solves (10/20/30 for
+    beginner/intermediate/advanced). Tracks a daily streak counter that
+    increments when the user solves at least one exercise on a new calendar
+    day. Both totals are displayed in the progress overlay. Global stats are
+    persisted to a separate stats.json file so the progress.json format is
+    unchanged.
+
+components:
+  XP:
+    name: Experience Points
+    description: Points awarded for solving exercises
+    requirements:
+      1: A correct answer on an exercise awards 10 XP (beginner), 20 XP (intermediate), or 30 XP (advanced)
+      2: XP is only awarded on the first correct solve of an exercise — re-solving an already completed exercise awards no XP
+      3: Total XP is stored in stats.json and persisted after every award
+      4: The progress overlay displays total XP on a summary line above the module table
+
+  STREAK:
+    name: Daily Streak
+    description: Consecutive days with at least one correct answer
+    requirements:
+      1: The streak counter starts at 1 on the first ever correct solve
+      2: Solving on the same calendar day as the last solve does not change the streak
+      3: Solving on the day immediately following the last active day increments the streak by 1
+      4: Solving after a gap of more than one day resets the streak to 1
+      5: The current streak is displayed in the progress overlay alongside XP
+      6: Last active day is stored as a Unix epoch day number (seconds / 86400) in stats.json
+
+  PERSIST:
+    name: Stats Persistence
+    description: Storage of global stats
+    requirements:
+      1: Stats are stored in ~/.local/share/cli-tutor/stats.json (respects XDG_DATA_HOME)
+      2: A missing stats.json produces default values (0 XP, 0 streak) with no error
+      3: A corrupt stats.json falls back to defaults with an eprintln warning
+      4: Stats are saved immediately after every XP award
+
+constraints:
+  ENG:
+    name: Engineering Constraints
+    requirements:
+      1: Stats live in a Stats struct in src/progress.rs; it exposes add_xp(u64), update_streak(), load(), save()
+      2: Stats does not import content types — the XP amount is computed in app.rs and passed as a plain u64
+      3: The Progress struct and progress.json format are unchanged — full backward compatibility
+      4: Stats fields use serde default attributes so partial JSON deserializes without error
