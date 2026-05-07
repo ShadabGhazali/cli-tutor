@@ -4,7 +4,7 @@ Set Shell "bash"
 Set FontSize 14
 Set Width 1200
 Set Height 700
-Set Theme "Tokyo Night"
+Set Theme "TokyoNight"
 Set Padding 20
 Set Framerate 24
 Set PlaybackSpeed 0.80
@@ -15,19 +15,23 @@ Type "cli-tutor"
 Enter
 Sleep 2s
 
-# Browse the module list
+# Navigate down to grep (5th module)
 Down
-Sleep 400ms
+Sleep 300ms
 Down
-Sleep 400ms
+Sleep 300ms
 Down
-Sleep 400ms
-Up
-Sleep 400ms
-Up
-Sleep 400ms
-Up
+Sleep 300ms
+Down
 Sleep 800ms
+
+# Scroll the intro
+Ctrl+D
+Sleep 600ms
+Ctrl+D
+Sleep 600ms
+Ctrl+U
+Sleep 600ms
 
 # Switch to Examples view
 Tab
@@ -37,7 +41,7 @@ Sleep 1.2s
 Tab
 Sleep 1.5s
 
-# Type a wrong answer first — makes the flow feel real
+# Type a wrong answer first
 Type "grep mango fruits.txt"
 Sleep 600ms
 Enter
@@ -59,11 +63,7 @@ Sleep 1s
 Ctrl+T
 Sleep 1.5s
 
-# Open the progress overlay
+# Show the progress overlay
 Sleep 400ms
-# Shift+P — note: VHS sends this as two keystrokes
-Sleep 2s
-
-# Quit
 Ctrl+C
 Sleep 500ms
