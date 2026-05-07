@@ -8,7 +8,7 @@ Learn Unix command-line tools by typing real commands — not reading about them
 Pick a tool, read the intro, try the examples, then solve exercises in a live shell.
 Each command you type is actually executed and checked against the expected output.
 
-![cli-tutor screenshot](assets/screenshot.png)
+![cli-tutor demo](assets/demo.gif)
 
 ---
 
