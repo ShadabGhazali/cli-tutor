@@ -77,25 +77,71 @@ Requires a terminal at least 80×24.
 
 ## Modules
 
+Sorted from most-used daily foundations through dev tools and into thematic real-world workflows.
+
+### Foundations — navigate and view
+
 | Tool | What it does | Exercises |
 |------|-------------|-----------|
-| `grep` | Search files for patterns | 12 |
-| `awk` | Field-based text processing and transformation | 10 |
-| `sed` | Stream editor — substitute, delete, insert lines | 10 |
-| `find` | Locate files by name, type, size, permissions | 9 |
-| `xargs` | Build and run commands from standard input | 6 |
-| `cut` | Extract fields and columns from text | 5 |
+| `ls` | List directory contents, spot hidden files, sort by time or size | 6 |
+| `cat` | Display and concatenate files — the start of every pipeline | 5 |
+| `head` | Preview the first N lines — check CSV headers, sample data | 5 |
+| `tail` | View the last N lines, skip headers, monitor recent log entries | 6 |
+
+### Search and filter
+
+| Tool | What it does | Exercises |
+|------|-------------|-----------|
+| `grep` | Search files for patterns using regular expressions | 12 |
+| `find` | Locate files by name, type, size, age, permissions | 9 |
+
+### Transform and process
+
+| Tool | What it does | Exercises |
+|------|-------------|-----------|
+| `cut` | Extract columns from delimited text | 5 |
 | `sort` | Sort lines — alphabetically, numerically, by field | 6 |
 | `uniq` | Remove or count duplicate adjacent lines | 4 |
+| `wc` | Count lines, words, and bytes | 6 |
 | `tr` | Translate or delete individual characters | 4 |
-| `wc` | Count lines, words, and bytes in files | 6 |
+| `sed` | Stream editor — substitute, delete, transform lines | 10 |
+| `awk` | Field-based processing language — extract, filter, aggregate | 10 |
+
+### Combine and compare
+
+| Tool | What it does | Exercises |
+|------|-------------|-----------|
+| `paste` | Merge lines from multiple files side by side | 4 |
+| `tee` | Fork a pipeline — write to a file AND pass through to stdout | 4 |
+| `diff` | Compare two files and show what changed | 5 |
+
+### Archive, permissions, and utilities
+
+| Tool | What it does | Exercises |
+|------|-------------|-----------|
+| `xargs` | Build and run commands from standard input | 6 |
 | `tar` | Create, list, and extract archive files | 5 |
 | `chmod` | Change file permissions | 6 |
+| `bc` | Arbitrary-precision arithmetic — percentages, averages in scripts | 4 |
+
+### Dev tools
+
+| Tool | What it does | Exercises |
+|------|-------------|-----------|
 | `git` | Version control — init, commit, branch, stash, diff | 10 |
 | `jq` | Query and transform JSON from the command line | 8 |
 | `make` | Automate build steps and tasks with Makefiles | 5 |
 
-**106 exercises** — beginner to advanced. Progress is saved automatically.
+### Real-world workflows
+
+These modules teach you to **combine tools in pipelines** to solve complete engineering tasks — not just individual command syntax.
+
+| Module | What it covers | Exercises |
+|--------|---------------|-----------|
+| `log-processing` | Analyze Apache/app logs: count requests, find errors, top-N IPs, error rates | 8 |
+| `text-processing` | Transform CSV data, extract fields, calculate stats, process config files | 8 |
+
+**161 exercises** — beginner to advanced. Progress is saved automatically.
 
 ---
 

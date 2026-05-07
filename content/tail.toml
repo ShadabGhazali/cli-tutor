@@ -1,0 +1,161 @@
+[module]
+name = "tail"
+description = "Print the last N lines — monitor logs and skip CSV headers"
+version = 1
+
+[intro]
+text = """
+## Why tail matters
+
+When something breaks, you tail the log. When a deployment finishes, you tail to verify. `tail` is indispensable for anyone who operates software in production.
+
+The most powerful usage — `tail -f` — follows a file in real time, printing each new line as it's written. You'll use it constantly: watching a server restart, monitoring a database migration, observing a test suite's output as it runs. (Note: exercises in this tutor can't test `-f` because it runs indefinitely until you press Ctrl+C, but it's a core daily-use pattern.)
+
+Beyond live monitoring, `tail` shines in two other scenarios:
+
+- **Skipping headers.** `tail -n +2 file.csv` starts output from line 2, which skips the CSV header row entirely. This lets you pipe data rows directly into `awk`, `sort`, or `cut` without special-casing the first line.
+- **Focusing on recent events.** Logs grow forever. `tail -n 100 app.log` gives you the last hundred entries — almost always the relevant ones when you're debugging a fresh incident.
+
+Combined with `grep`, `tail` becomes a surgical tool: `tail -n 500 app.log | grep ERROR` finds errors only in the recent window, avoiding noise from ancient history.
+
+## Key flags
+
+- `-n N` — print the last N lines. Default is 10.
+- `-n +N` — print from line N to the **end** of the file. Crucially, this skips the first N-1 lines. `tail -n +2` skips line 1 (the header).
+- `-1` — shorthand for `-n 1`: print only the very last line. Useful for extracting the latest version, most recent log entry, or last result.
+- `-f` — **follow**: keep the file open and print new lines as they are appended. Press Ctrl+C to stop. The go-to tool for watching live logs.
+
+## Real-world workflows
+
+**Following a deployment log in real time:**
+```
+tail -f /var/log/deploy.log
+```
+Every new line written by the deploy script appears on your terminal as it happens.
+
+**Skipping CSV headers before processing:**
+```
+tail -n +2 users.csv | awk -F',' '{print $1, $3}'
+```
+Skips the header row so `awk` only sees data rows — no need to add `NR > 1` guards.
+
+**Finding the most recent error:**
+```
+grep 'ERROR' app.log | tail -1
+```
+Combine `grep` to filter error lines with `tail -1` to get the last one — the most recent failure.
+"""
+
+[[examples]]
+title = "View the last 5 lines of a log"
+description = "Quickly see the most recent entries in a log file"
+command = "tail -n 5 deploy.log"
+output = "Step 6: running migrations\nStep 7: warming cache\nStep 8: health check\nStep 9: routing traffic\nStep 10: deployment complete\n"
+
+[[examples]]
+title = "Skip the CSV header row"
+description = "tail -n +2 starts from line 2, skipping the header"
+command = "tail -n +2 orders.csv"
+output = "1001,Widget,29.99\n1002,Gadget,49.99\n1003,Doohickey,9.99\n1004,Thingamajig,19.99\n"
+
+[[exercises]]
+id = "tail.1"
+difficulty = "beginner"
+question = """The file `deploy.log` records each step of a deployment process. Show only the last 5 lines to see how the deployment ended."""
+expected_output = "Step 6: running migrations\nStep 7: warming cache\nStep 8: health check\nStep 9: routing traffic\nStep 10: deployment complete\n"
+hints = [
+  "Use the -n flag to specify how many lines from the end",
+  "Try: tail -n 5 deploy.log",
+]
+solution = "tail -n 5 deploy.log"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "deploy.log"
+content = "Step 1: pulling image\nStep 2: stopping container\nStep 3: removing old container\nStep 4: creating container\nStep 5: starting container\nStep 6: running migrations\nStep 7: warming cache\nStep 8: health check\nStep 9: routing traffic\nStep 10: deployment complete\n"
+
+[[exercises]]
+id = "tail.2"
+difficulty = "beginner"
+question = """The file `versions.txt` lists software versions in order. Print only the most recent (last) version."""
+expected_output = "v2.1.0\n"
+hints = [
+  "The most recent version is the last line of the file",
+  "tail -1 is a shorthand for tail -n 1",
+  "Try: tail -1 versions.txt",
+]
+solution = "tail -1 versions.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "versions.txt"
+content = "v1.0.0\nv1.1.0\nv1.2.0\nv2.0.0\nv2.1.0\n"
+
+[[exercises]]
+id = "tail.3"
+difficulty = "beginner"
+question = """`tail -n +2` starts output from line 2, effectively skipping the header. Print all data rows from `orders.csv`, excluding the header."""
+expected_output = "1001,Widget,29.99\n1002,Gadget,49.99\n1003,Doohickey,9.99\n1004,Thingamajig,19.99\n"
+hints = [
+  "The + prefix in -n +N means 'start from line N', not 'last N lines'",
+  "To skip the header (line 1), start from line 2",
+  "Try: tail -n +2 orders.csv",
+]
+solution = "tail -n +2 orders.csv"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "orders.csv"
+content = "order_id,product,price\n1001,Widget,29.99\n1002,Gadget,49.99\n1003,Doohickey,9.99\n1004,Thingamajig,19.99\n"
+
+[[exercises]]
+id = "tail.4"
+difficulty = "intermediate"
+question = """The service log `app.log` contains multiple ERROR entries mixed with INFO lines. Find the LAST error that occurred."""
+expected_output = "ERROR connection refused\n"
+hints = [
+  "First filter for ERROR lines with grep, then take the last one",
+  "Pipe grep output into tail -1",
+  "Try: grep 'ERROR' app.log | tail -1",
+]
+solution = "grep 'ERROR' app.log | tail -1"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "app.log"
+content = "INFO service started\nINFO request received\nERROR database timeout\nINFO retry attempt\nINFO request received\nERROR connection refused\nINFO recovered\nINFO request completed\n"
+
+[[exercises]]
+id = "tail.5"
+difficulty = "intermediate"
+question = """The file `server.log` has 20 lines. The first 10 are routine INFO messages from earlier; the last 10 are the relevant recent window. Count how many ERROR lines appear in the last 10 lines only."""
+expected_output = "4\n"
+hints = [
+  "Use tail -n 10 to isolate the recent window",
+  "Pipe into grep -c 'ERROR' to count matching lines",
+  "Try: tail -n 10 server.log | grep -c 'ERROR'",
+]
+solution = "tail -n 10 server.log | grep -c 'ERROR'"
+match_mode = "normalized"
+
+[[exercises.fixtures]]
+filename = "server.log"
+content = "INFO normal operation\nINFO normal operation\nINFO normal operation\nINFO normal operation\nINFO normal operation\nINFO normal operation\nINFO normal operation\nINFO normal operation\nINFO normal operation\nINFO normal operation\nINFO request ok\nERROR timeout\nINFO request ok\nERROR disk full\nINFO request ok\nERROR oom\nINFO request ok\nINFO request ok\nERROR crash\nINFO request ok\n"
+
+[[exercises]]
+id = "tail.6"
+difficulty = "advanced"
+question = """From the last 6 entries in `access.log`, find all unique client IP addresses (first field), sorted alphabetically."""
+expected_output = "10.0.0.2\n10.0.0.3\n10.0.0.4\n10.0.0.5\n"
+hints = [
+  "Use tail -n 6 to get the last 6 lines",
+  "Pipe to awk '{print $1}' to extract the first field (the IP address)",
+  "Pipe to sort -u to sort and deduplicate in one step",
+  "Try: tail -n 6 access.log | awk '{print $1}' | sort -u",
+]
+solution = "tail -n 6 access.log | awk '{print $1}' | sort -u"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "10.0.0.1 GET /health\n10.0.0.1 GET /health\n10.0.0.1 GET /health\n10.0.0.2 GET /api\n10.0.0.3 POST /login\n10.0.0.2 GET /data\n10.0.0.4 GET /api\n10.0.0.3 GET /api\n10.0.0.5 DELETE /item\n"

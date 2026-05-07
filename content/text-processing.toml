@@ -1,0 +1,223 @@
+[module]
+name = "text-processing"
+description = "Combine Unix tools to transform, extract, and reshape structured text data"
+version = 1
+
+[intro]
+text = """
+## The Unix philosophy of text processing
+
+Every Unix tool does one thing well and communicates through text streams. The real power comes from composing them: the output of one tool becomes the input of the next. A five-command pipeline can answer a complex data question in under a second — no Python environment, no database, no imports.
+
+Software engineers use text processing constantly:
+- Parsing CSV exports from databases or APIs
+- Transforming config files during deployments
+- Extracting metrics from structured reports
+- Cleaning and reshaping data before loading it into a system
+- Generating summaries from build artifacts
+
+## The mental model: a stream of lines
+
+Think of each pipeline stage as a transformation on an infinite stream of text lines:
+
+```
+source → filter → extract → transform → aggregate → format
+  cat     grep      cut       sed/tr      sort/uniq    awk/printf
+```
+
+You don't need to load the whole file — the stream flows through. This is why Unix pipelines handle gigabyte log files as easily as small ones.
+
+## Choosing the right tool
+
+| Scenario | Tool |
+|----------|------|
+| Extract one column from CSV | `cut -d, -f2` |
+| Extract multiple columns or do math | `awk -F,` |
+| Find/replace a string | `sed 's/old/new/g'` |
+| Remove or map characters | `tr` |
+| Skip a header row | `tail -n +2` |
+| Sort and deduplicate | `sort -u` |
+| Count unique values | `sort | uniq -c | sort -rn` |
+| Build column from separate files | `paste` |
+| Show first/last N rows | `head` / `tail` |
+
+## A real-world example
+
+Given a CSV of services with their status:
+```
+name,status,region
+api-gateway,healthy,us-east
+payments,degraded,us-east
+auth,healthy,eu-west
+cache,down,us-east
+```
+
+Find all unhealthy services in us-east, sorted by name:
+```bash
+tail -n +2 services.csv \\
+  | grep 'us-east' \\
+  | grep -v ',healthy,' \\
+  | cut -d, -f1 \\
+  | sort
+```
+Output:
+```
+cache
+payments
+```
+
+No loops, no variables, no classes — just a composed pipeline.
+"""
+
+[[examples]]
+title = "Extract a CSV column"
+description = "Pull the second column from a comma-delimited file, skipping the header"
+command = "tail -n +2 employees.csv | cut -d, -f1"
+output = "Alice\nBob\nCharlie\nDiana\n"
+
+[[examples]]
+title = "Find the maximum value in a column"
+description = "Sort a numeric column and take the first value"
+command = "tail -n +2 employees.csv | cut -d, -f3 | sort -rn | head -1"
+output = "102000\n"
+
+[[exercises]]
+id = "text-processing.1"
+difficulty = "beginner"
+question = """The file `employees.csv` has a header row followed by employee records. Extract just the employee names (first column), skipping the header."""
+expected_output = "Alice\nBob\nCharlie\nDiana\nEve\nFrank\nGrace\nHenry\nIvy\n"
+hints = [
+  "tail -n +2 skips the first line (the header)",
+  "cut -d, -f1 extracts the first comma-delimited field",
+  "Try: tail -n +2 employees.csv | cut -d, -f1",
+]
+solution = "tail -n +2 employees.csv | cut -d, -f1"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "employees.csv"
+content = "name,department,salary,years\nAlice,Engineering,95000,5\nBob,Marketing,72000,3\nCharlie,Engineering,88000,7\nDiana,HR,65000,2\nEve,Engineering,102000,8\nFrank,Marketing,78000,4\nGrace,HR,70000,6\nHenry,Engineering,91000,3\nIvy,Marketing,81000,2\n"
+
+[[exercises]]
+id = "text-processing.2"
+difficulty = "beginner"
+question = """From `employees.csv`, find all employees in the Engineering department and print their names, one per line."""
+expected_output = "Alice\nCharlie\nEve\nHenry\n"
+hints = [
+  "grep filters lines containing 'Engineering'",
+  "cut -d, -f1 extracts just the name",
+  "Try: grep 'Engineering' employees.csv | cut -d, -f1",
+]
+solution = "grep 'Engineering' employees.csv | cut -d, -f1"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "employees.csv"
+content = "name,department,salary,years\nAlice,Engineering,95000,5\nBob,Marketing,72000,3\nCharlie,Engineering,88000,7\nDiana,HR,65000,2\nEve,Engineering,102000,8\nFrank,Marketing,78000,4\nGrace,HR,70000,6\nHenry,Engineering,91000,3\nIvy,Marketing,81000,2\n"
+
+[[exercises]]
+id = "text-processing.3"
+difficulty = "beginner"
+question = """In `config.ini`, replace all occurrences of `localhost` with `db.prod.internal`. Print the transformed content."""
+expected_output = "host=db.prod.internal\nport=5432\nreplica=db.prod.internal\ntimeout=30\n"
+hints = [
+  "sed 's/old/new/g' replaces all occurrences on each line",
+  "Try: sed 's/localhost/db.prod.internal/g' config.ini",
+]
+solution = "sed 's/localhost/db.prod.internal/g' config.ini"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "config.ini"
+content = "host=localhost\nport=5432\nreplica=localhost\ntimeout=30\n"
+
+[[exercises]]
+id = "text-processing.4"
+difficulty = "intermediate"
+question = """Count the number of employees in each department in `employees.csv`. Print in descending order of count, format: `COUNT DEPARTMENT`."""
+expected_output = "4 Engineering\n3 Marketing\n2 HR\n"
+hints = [
+  "awk -F, '{count[$2]++}' counts by the 2nd field (department)",
+  "Skip the header with NR>1 or tail -n +2 before awk",
+  "sort -rn orders by count descending",
+  "Try: tail -n +2 employees.csv | awk -F, '{count[$2]++} END {for (d in count) print count[d], d}' | sort -rn",
+]
+solution = "tail -n +2 employees.csv | awk -F, '{count[$2]++} END {for (d in count) print count[d], d}' | sort -rn"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "employees.csv"
+content = "name,department,salary,years\nAlice,Engineering,95000,5\nBob,Marketing,72000,3\nCharlie,Engineering,88000,7\nDiana,HR,65000,2\nEve,Engineering,102000,8\nFrank,Marketing,78000,4\nGrace,HR,70000,6\nHenry,Engineering,91000,3\nIvy,Marketing,81000,2\n"
+
+[[exercises]]
+id = "text-processing.5"
+difficulty = "intermediate"
+question = """Find the highest-paid employee in each department from `employees.csv`. Print one line per department in the format `DEPARTMENT: NAME SALARY`, sorted alphabetically by department."""
+expected_output = "Engineering: Eve 102000\nHR: Grace 70000\nMarketing: Ivy 81000\n"
+hints = [
+  "awk -F, can track max salary per department across all rows",
+  "Use two awk arrays: max_sal[$2] and max_name[$2]",
+  "In the END block, print and sort the results",
+  "Try: tail -n +2 employees.csv | awk -F, '{if ($3 > max[$2]) {max[$2]=$3; name[$2]=$1}} END {for (d in max) print d\": \"name[d], max[d]}' | sort",
+]
+solution = "tail -n +2 employees.csv | awk -F, '{if ($3 > max[$2]) {max[$2]=$3; name[$2]=$1}} END {for (d in max) print d\": \"name[d], max[d]}' | sort"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "employees.csv"
+content = "name,department,salary,years\nAlice,Engineering,95000,5\nBob,Marketing,72000,3\nCharlie,Engineering,88000,7\nDiana,HR,65000,2\nEve,Engineering,102000,8\nFrank,Marketing,78000,4\nGrace,HR,70000,6\nHenry,Engineering,91000,3\nIvy,Marketing,81000,2\n"
+
+[[exercises]]
+id = "text-processing.6"
+difficulty = "intermediate"
+question = """The file `services.txt` lists microservice names, one per line. Some names appear multiple times (multiple instances). Generate a unique, sorted list of service names with their instance counts, format: `COUNT SERVICE`."""
+expected_output = "4 api-gateway\n3 auth\n2 payments\n1 worker\n"
+hints = [
+  "sort first groups identical names together",
+  "uniq -c counts consecutive duplicates",
+  "sort -rn orders by count descending",
+  "awk '{print $1, $2}' removes BSD uniq's leading spaces",
+  "Try: sort services.txt | uniq -c | sort -rn | awk '{print $1, $2}'",
+]
+solution = "sort services.txt | uniq -c | sort -rn | awk '{print $1, $2}'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "services.txt"
+content = "api-gateway\npayments\nauth\napi-gateway\nworker\nauth\npayments\napi-gateway\nauth\napi-gateway\n"
+
+[[exercises]]
+id = "text-processing.7"
+difficulty = "advanced"
+question = """The file `events.csv` records user events with columns `user,action,timestamp`. Find users who performed the `purchase` action, extract their user IDs, remove duplicates, and print them sorted alphabetically."""
+expected_output = "user102\nuser201\nuser305\n"
+hints = [
+  "grep 'purchase' filters purchase events",
+  "cut -d, -f1 extracts the user ID",
+  "sort -u deduplicates while sorting",
+  "Try: grep 'purchase' events.csv | cut -d, -f1 | sort -u",
+]
+solution = "grep 'purchase' events.csv | cut -d, -f1 | sort -u"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "events.csv"
+content = "user,action,timestamp\nuser102,view,2024-01-01T10:00:01\nuser201,purchase,2024-01-01T10:00:02\nuser305,view,2024-01-01T10:00:03\nuser102,purchase,2024-01-01T10:00:04\nuser201,view,2024-01-01T10:00:05\nuser305,purchase,2024-01-01T10:00:06\nuser102,view,2024-01-01T10:00:07\nuser201,purchase,2024-01-01T10:00:08\nuser401,view,2024-01-01T10:00:09\nuser401,view,2024-01-01T10:00:10\n"
+
+[[exercises]]
+id = "text-processing.8"
+difficulty = "advanced"
+question = """You have a `requirements.txt` with Python package specs (possibly with version pins). Extract just the package names (the part before any `==`, `>=`, `~=`, or `[` character), convert them to lowercase, sort alphabetically, and remove duplicates."""
+expected_output = "boto3\ndjango\nflask\nnumpy\npandas\nrequests\n"
+hints = [
+  "sed 's/[=>~!\\[].*//' strips version specifiers from each line",
+  "tr '[:upper:]' '[:lower:]' lowercases the result",
+  "sort -u sorts and deduplicates",
+  "Try: sed 's/[=>~!\\[].*//' requirements.txt | tr '[:upper:]' '[:lower:]' | sort -u",
+]
+solution = "sed 's/[=>~!\\[].*//' requirements.txt | tr '[:upper:]' '[:lower:]' | sort -u"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "requirements.txt"
+content = "Flask==2.3.0\nrequests>=2.28.0\nDjango~=4.2\nnumpy==1.24.0\npandas>=1.5.0\nboto3>=1.26.0\nFlask==2.3.0\nrequests>=2.31.0\n"

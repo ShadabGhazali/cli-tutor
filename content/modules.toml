@@ -1,2 +1,14 @@
-# Module display order — command_modules.LOADING.5
-modules = ["grep", "awk", "sed", "find", "xargs", "cut", "sort", "uniq", "tr", "wc", "tar", "chmod", "git", "jq", "make"]
+# Module display order — sorted by usefulness in day-to-day software engineering
+# Foundations first, then search/filter, then transform, then combine/compare,
+# then dev tools, then thematic workflow modules.
+modules = [
+  "ls", "cat", "head", "tail",
+  "grep", "find",
+  "cut", "sort", "uniq", "wc", "tr",
+  "sed", "awk",
+  "paste", "tee", "diff",
+  "xargs", "tar", "chmod",
+  "bc",
+  "git", "jq", "make",
+  "log-processing", "text-processing"
+]

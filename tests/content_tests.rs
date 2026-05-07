@@ -8,26 +8,42 @@ fn all_bundled_toml_files_deserialize() {
 }
 
 #[test]
-fn fifteen_modules_loaded_at_launch() {
-    // more_modules.MODULES.1 — 15 modules total
+fn twenty_five_modules_loaded_at_launch() {
     let modules = load_modules();
-    assert_eq!(modules.len(), 15);
+    assert_eq!(modules.len(), 25);
     let names: Vec<&str> = modules.iter().map(|m| m.module.name.as_str()).collect();
+    // foundations
+    assert!(names.contains(&"ls"));
+    assert!(names.contains(&"cat"));
+    assert!(names.contains(&"head"));
+    assert!(names.contains(&"tail"));
+    // search
     assert!(names.contains(&"grep"));
-    assert!(names.contains(&"awk"));
-    assert!(names.contains(&"sed"));
     assert!(names.contains(&"find"));
-    assert!(names.contains(&"xargs"));
+    // transform
     assert!(names.contains(&"cut"));
     assert!(names.contains(&"sort"));
     assert!(names.contains(&"uniq"));
-    assert!(names.contains(&"tr"));
     assert!(names.contains(&"wc"));
+    assert!(names.contains(&"tr"));
+    assert!(names.contains(&"sed"));
+    assert!(names.contains(&"awk"));
+    // combine/compare
+    assert!(names.contains(&"paste"));
+    assert!(names.contains(&"tee"));
+    assert!(names.contains(&"diff"));
+    // utilities
+    assert!(names.contains(&"xargs"));
     assert!(names.contains(&"tar"));
     assert!(names.contains(&"chmod"));
+    assert!(names.contains(&"bc"));
+    // dev tools
     assert!(names.contains(&"git"));
     assert!(names.contains(&"jq"));
     assert!(names.contains(&"make"));
+    // thematic workflows
+    assert!(names.contains(&"log-processing"));
+    assert!(names.contains(&"text-processing"));
 }
 
 #[test]

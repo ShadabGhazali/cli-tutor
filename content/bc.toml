@@ -1,0 +1,91 @@
+[module]
+name = "bc"
+description = "Arbitrary-precision arithmetic calculator for shell scripts"
+version = 1
+
+[intro]
+text = """
+## Why bc matters
+
+Shell arithmetic (`$(( ))`) only handles integers. The moment you need a decimal result — calculating an error rate, computing an average, converting units — `$(( ))` fails you. `bc` is the POSIX-standard answer: a full arbitrary-precision calculator that reads expressions from stdin and prints results to stdout, making it a natural fit for pipelines.
+
+The idiom is simple: `echo "expression" | bc`. You set precision with `scale=N` before the expression. You can also build the expression dynamically with `awk` or other tools and pipe it into `bc`, which is how you compute aggregates like averages from data files.
+
+## Key concepts
+
+- `scale=N` — sets the number of decimal places in the result. Must appear before the division expression.
+- `echo "expr" | bc` — the standard pipeline idiom for one-off calculations
+- `bc -l` — loads the math library, enabling functions like `sqrt()`, `s()` (sin), `c()` (cos), and `l()` (natural log)
+
+## Real-world workflows
+
+- **Incident reports**: `echo "scale=2; $errors * 100 / $total" | bc` to compute error rates
+- **Monitoring data**: combine `awk` (to sum values and build the expression) with `bc` (to divide and format)
+- **Deployment scripts**: convert bytes to megabytes, compute percentages of thresholds, check if a ratio exceeds a limit
+"""
+
+[[examples]]
+title = "Basic arithmetic"
+description = "Evaluate a simple arithmetic expression"
+command = "echo \"3 * 7\" | bc"
+output = "21\n"
+
+[[examples]]
+title = "Decimal division"
+description = "Divide with decimal precision using scale"
+command = "echo \"scale=3; 1 / 3\" | bc"
+output = ".333\n"
+
+[[exercises]]
+id = "bc.1"
+difficulty = "beginner"
+question = """Calculate 15 + 27 using `bc`."""
+expected_output = "42\n"
+hints = [
+  "Pipe the expression into bc with echo",
+  "Try: echo \"15 + 27\" | bc",
+]
+solution = "echo \"15 + 27\" | bc"
+match_mode = "exact"
+
+[[exercises]]
+id = "bc.2"
+difficulty = "beginner"
+question = """Calculate 22/7 to 2 decimal places. Use `scale=2` to control precision."""
+expected_output = "3.14\n"
+hints = [
+  "Set scale=2 before the division in the same expression string",
+  "Try: echo \"scale=2; 22/7\" | bc",
+]
+solution = "echo \"scale=2; 22/7\" | bc"
+match_mode = "exact"
+
+[[exercises]]
+id = "bc.3"
+difficulty = "intermediate"
+question = """347 out of 500 tests passed. Calculate the pass rate as a percentage with 1 decimal place."""
+expected_output = "69.4\n"
+hints = [
+  "Multiply by 100 first, then divide — integer division truncates, so order matters",
+  "Set scale=1 for one decimal place",
+  "Try: echo \"scale=1; 347 * 100 / 500\" | bc",
+]
+solution = "echo \"scale=1; 347 * 100 / 500\" | bc"
+match_mode = "exact"
+
+[[exercises]]
+id = "bc.4"
+difficulty = "advanced"
+question = """The file `response_times.txt` contains API response times in milliseconds, one per line. Calculate the average response time to 1 decimal place by combining `awk` (to sum the values and build the bc expression) with `bc` (to evaluate it)."""
+expected_output = "262.2\n"
+hints = [
+  "Use awk to accumulate the sum and count, then emit a bc expression like 'scale=1; 1311/5'",
+  "Pipe that awk output directly into bc",
+  "Try: awk '{sum+=$1} END {print \"scale=1; \" sum \"/\" NR}' response_times.txt | bc",
+]
+solution = "awk '{sum+=$1} END {print \"scale=1; \" sum \"/\" NR}' response_times.txt | bc"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "response_times.txt"
+content = "245\n312\n198\n267\n289\n"

@@ -1,0 +1,219 @@
+[module]
+name = "log-processing"
+description = "Real-world log analysis: filter, extract, and aggregate log data with Unix tools"
+version = 1
+
+[intro]
+text = """
+## Why log analysis matters
+
+When production breaks at 3 AM, logs are the first thing you reach for. When a security team asks "who accessed this endpoint yesterday?", the answer is in the logs. When a performance regression ships, the evidence is in response time histograms you build from access logs.
+
+Logs are the ground truth of a running system — but they're only useful if you can query them fast. Unix text tools are often faster than loading data into Splunk or Elasticsearch, especially for ad-hoc questions on log files already on disk.
+
+## The analysis workflow
+
+Most log analysis follows the same five-step pattern:
+
+```
+raw log  →  filter  →  extract fields  →  aggregate  →  report
+```
+
+1. **Filter** — `grep` to isolate relevant lines (errors, a specific user, a time range)
+2. **Extract fields** — `awk` or `cut` to pull out the column you care about (IP, status code, path)
+3. **Aggregate** — `sort | uniq -c | sort -rn` or awk associative arrays for frequency counts
+4. **Format** — `awk '{printf ...}'` for readable output or percentages
+5. **Spot-check** — `head`/`tail` to verify the result looks right
+
+## Common log formats
+
+**Apache / Nginx combined access log:**
+```
+192.168.1.10 - - [01/Jan/2024:10:00:01 +0000] "GET /api/users HTTP/1.1" 200 1234
+```
+Fields: IP($1), ident($2), user($3), timestamp($4 $5), request($6 $7 $8), status($9), bytes($10)
+
+**Syslog:**
+```
+Jan  1 10:00:01 hostname servicename[pid]: message
+```
+
+**JSON Lines (common in modern apps):**
+```
+{"ts":"2024-01-01T10:00:01Z","level":"ERROR","msg":"timeout","svc":"api"}
+```
+Use `jq` for structured JSON logs; use `grep` + `cut` for quick field extraction.
+
+**Application log (structured text):**
+```
+2024-01-01 10:00:01 ERROR [api] database connection timeout (attempt 3/3)
+```
+
+## Key tools and when to use them
+
+| Tool | Best for |
+|------|----------|
+| `grep` | Filtering lines by keyword or pattern |
+| `awk` | Field extraction, arithmetic, associative arrays |
+| `cut` | Simple fixed-delimiter column extraction |
+| `sort | uniq -c | sort -rn` | Frequency count (top-N pattern) |
+| `wc -l` | Quick total counts |
+| `tail -f` | Following a live log in real time |
+| `sed` | Transforming or redacting log lines |
+
+## The top-N pattern
+
+The most useful log analysis idiom:
+```bash
+awk '{print $FIELD}' access.log | sort | uniq -c | sort -rn | head -N
+```
+This counts occurrences of each unique value in a field and shows the top N. Use it for: top IPs, most common errors, busiest endpoints, peak hours.
+"""
+
+[[examples]]
+title = "Count total requests"
+description = "The simplest log metric — how many requests did the server handle?"
+command = "wc -l < access.log"
+output = "12\n"
+
+[[examples]]
+title = "Find all server errors"
+description = "Isolate 5xx errors for immediate investigation"
+command = "grep '\" 5' access.log | awk '{print $9, $7}'"
+output = "500 /api/users\n500 /api/users\n"
+
+[[exercises]]
+id = "log-processing.1"
+difficulty = "beginner"
+question = """The file `access.log` is an Apache-format web server log. Count the total number of requests it contains. Print just the number."""
+expected_output = "12\n"
+hints = [
+  "wc -l counts lines; redirect with < to suppress the filename",
+  "Try: wc -l < access.log",
+]
+solution = "wc -l < access.log | tr -d ' '"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.10 - - [01/Jan/2024:10:00:01 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:02 +0000] \"POST /api/login HTTP/1.1\" 401 89\n192.168.1.10 - - [01/Jan/2024:10:00:03 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:04 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:05 +0000] \"GET /api/users HTTP/1.1\" 500 0\n192.168.1.10 - - [01/Jan/2024:10:00:06 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:07 +0000] \"POST /api/login HTTP/1.1\" 200 512\n172.16.0.1 - - [01/Jan/2024:10:00:08 +0000] \"GET /api/health HTTP/1.1\" 200 8\n192.168.1.10 - - [01/Jan/2024:10:00:09 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:10 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:11 +0000] \"GET /api/users HTTP/1.1\" 500 0\n10.0.0.5 - - [01/Jan/2024:10:00:12 +0000] \"GET /api/data HTTP/1.1\" 403 0\n"
+
+[[exercises]]
+id = "log-processing.2"
+difficulty = "beginner"
+question = """Something is wrong — the monitoring alert fired for 5xx errors. Find all lines in `access.log` that contain server errors (HTTP status 5xx). Print the full log lines."""
+expected_output = "172.16.0.1 - - [01/Jan/2024:10:00:05 +0000] \"GET /api/users HTTP/1.1\" 500 0\n172.16.0.1 - - [01/Jan/2024:10:00:11 +0000] \"GET /api/users HTTP/1.1\" 500 0\n"
+hints = [
+  "HTTP status codes appear as the 9th field; filter for lines containing \" 5 (quote space 5)",
+  "Try: grep '\" 5' access.log",
+]
+solution = "grep '\" 5' access.log"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.10 - - [01/Jan/2024:10:00:01 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:02 +0000] \"POST /api/login HTTP/1.1\" 401 89\n192.168.1.10 - - [01/Jan/2024:10:00:03 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:04 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:05 +0000] \"GET /api/users HTTP/1.1\" 500 0\n192.168.1.10 - - [01/Jan/2024:10:00:06 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:07 +0000] \"POST /api/login HTTP/1.1\" 200 512\n172.16.0.1 - - [01/Jan/2024:10:00:08 +0000] \"GET /api/health HTTP/1.1\" 200 8\n192.168.1.10 - - [01/Jan/2024:10:00:09 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:10 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:11 +0000] \"GET /api/users HTTP/1.1\" 500 0\n10.0.0.5 - - [01/Jan/2024:10:00:12 +0000] \"GET /api/data HTTP/1.1\" 403 0\n"
+
+[[exercises]]
+id = "log-processing.3"
+difficulty = "beginner"
+question = """List all unique API endpoints (request paths, field 7) that appear in `access.log`, sorted alphabetically. Each path should appear exactly once."""
+expected_output = "/api/data\n/api/health\n/api/login\n/api/users\n"
+hints = [
+  "awk '{print $7}' extracts the URL path (7th field)",
+  "sort -u both sorts and deduplicates",
+  "Try: awk '{print $7}' access.log | sort -u",
+]
+solution = "awk '{print $7}' access.log | sort -u"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.10 - - [01/Jan/2024:10:00:01 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:02 +0000] \"POST /api/login HTTP/1.1\" 401 89\n192.168.1.10 - - [01/Jan/2024:10:00:03 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:04 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:05 +0000] \"GET /api/users HTTP/1.1\" 500 0\n192.168.1.10 - - [01/Jan/2024:10:00:06 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:07 +0000] \"POST /api/login HTTP/1.1\" 200 512\n172.16.0.1 - - [01/Jan/2024:10:00:08 +0000] \"GET /api/health HTTP/1.1\" 200 8\n192.168.1.10 - - [01/Jan/2024:10:00:09 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:10 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:11 +0000] \"GET /api/users HTTP/1.1\" 500 0\n10.0.0.5 - - [01/Jan/2024:10:00:12 +0000] \"GET /api/data HTTP/1.1\" 403 0\n"
+
+[[exercises]]
+id = "log-processing.4"
+difficulty = "intermediate"
+question = """Count how many requests each HTTP status code received in `access.log`. Print counts in descending order (most frequent first), with one line per status code in the format: `COUNT STATUS`."""
+expected_output = "6 200\n3 401\n2 500\n1 403\n"
+hints = [
+  "awk '{count[$9]++} END {...}' builds a frequency map of the 9th field",
+  "Sort the result numerically in reverse: sort -rn",
+  "Try: awk '{count[$9]++} END {for (c in count) print count[c], c}' access.log | sort -rn",
+]
+solution = "awk '{count[$9]++} END {for (c in count) print count[c], c}' access.log | sort -rn"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.10 - - [01/Jan/2024:10:00:01 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:02 +0000] \"POST /api/login HTTP/1.1\" 401 89\n192.168.1.10 - - [01/Jan/2024:10:00:03 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:04 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:05 +0000] \"GET /api/users HTTP/1.1\" 500 0\n192.168.1.10 - - [01/Jan/2024:10:00:06 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:07 +0000] \"POST /api/login HTTP/1.1\" 200 512\n172.16.0.1 - - [01/Jan/2024:10:00:08 +0000] \"GET /api/health HTTP/1.1\" 200 8\n192.168.1.10 - - [01/Jan/2024:10:00:09 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:10 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:11 +0000] \"GET /api/users HTTP/1.1\" 500 0\n10.0.0.5 - - [01/Jan/2024:10:00:12 +0000] \"GET /api/data HTTP/1.1\" 403 0\n"
+
+[[exercises]]
+id = "log-processing.5"
+difficulty = "intermediate"
+question = """Find the top 2 client IP addresses by request count in `access.log`. Print in descending order: `COUNT IP`."""
+expected_output = "5 10.0.0.5\n4 192.168.1.10\n"
+hints = [
+  "awk '{count[$1]++} END {...}' counts by IP (field 1)",
+  "sort -rn | head -2 gets the top 2",
+  "Try: awk '{count[$1]++} END {for (ip in count) print count[ip], ip}' access.log | sort -rn | head -2",
+]
+solution = "awk '{count[$1]++} END {for (ip in count) print count[ip], ip}' access.log | sort -rn | head -2"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.10 - - [01/Jan/2024:10:00:01 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:02 +0000] \"POST /api/login HTTP/1.1\" 401 89\n192.168.1.10 - - [01/Jan/2024:10:00:03 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:04 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:05 +0000] \"GET /api/users HTTP/1.1\" 500 0\n192.168.1.10 - - [01/Jan/2024:10:00:06 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:07 +0000] \"POST /api/login HTTP/1.1\" 200 512\n172.16.0.1 - - [01/Jan/2024:10:00:08 +0000] \"GET /api/health HTTP/1.1\" 200 8\n192.168.1.10 - - [01/Jan/2024:10:00:09 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:10 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:11 +0000] \"GET /api/users HTTP/1.1\" 500 0\n10.0.0.5 - - [01/Jan/2024:10:00:12 +0000] \"GET /api/data HTTP/1.1\" 403 0\n"
+
+[[exercises]]
+id = "log-processing.6"
+difficulty = "intermediate"
+question = """Security review: find the IP address that made the most failed authentication attempts (HTTP 401) in `access.log`. Print just the IP address."""
+expected_output = "10.0.0.5\n"
+hints = [
+  "First filter for 401 lines with grep, then count IPs with awk",
+  "grep '\" 401' | awk '{count[$1]++} END {...}' | sort -rn | head -1",
+  "Extract just the IP from the result with awk '{print $2}'",
+]
+solution = "grep '\" 401' access.log | awk '{count[$1]++} END {for (ip in count) print count[ip], ip}' | sort -rn | head -1 | awk '{print $2}'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.10 - - [01/Jan/2024:10:00:01 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:02 +0000] \"POST /api/login HTTP/1.1\" 401 89\n192.168.1.10 - - [01/Jan/2024:10:00:03 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:04 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:05 +0000] \"GET /api/users HTTP/1.1\" 500 0\n192.168.1.10 - - [01/Jan/2024:10:00:06 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:07 +0000] \"POST /api/login HTTP/1.1\" 200 512\n172.16.0.1 - - [01/Jan/2024:10:00:08 +0000] \"GET /api/health HTTP/1.1\" 200 8\n192.168.1.10 - - [01/Jan/2024:10:00:09 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:10 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:11 +0000] \"GET /api/users HTTP/1.1\" 500 0\n10.0.0.5 - - [01/Jan/2024:10:00:12 +0000] \"GET /api/data HTTP/1.1\" 403 0\n"
+
+[[exercises]]
+id = "log-processing.7"
+difficulty = "advanced"
+question = """Calculate the error rate: what percentage of requests in `access.log` resulted in an error (HTTP status 400 or higher)? Print the result as a percentage with one decimal place, e.g. `50.0%`."""
+expected_output = "50.0%\n"
+hints = [
+  "awk can count conditionally: $9 >= 400 counts error requests",
+  "Use NR for the total request count in the END block",
+  "printf \"%.1f%%\\n\" formats with one decimal and a percent sign",
+  "Try: awk '$9 >= 400 {err++} END {printf \"%.1f%%\\n\", err/NR*100}' access.log",
+]
+solution = "awk '$9 >= 400 {err++} END {printf \"%.1f%%\\n\", err/NR*100}' access.log"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.10 - - [01/Jan/2024:10:00:01 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:02 +0000] \"POST /api/login HTTP/1.1\" 401 89\n192.168.1.10 - - [01/Jan/2024:10:00:03 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:04 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:05 +0000] \"GET /api/users HTTP/1.1\" 500 0\n192.168.1.10 - - [01/Jan/2024:10:00:06 +0000] \"GET /api/data HTTP/1.1\" 200 456\n10.0.0.5 - - [01/Jan/2024:10:00:07 +0000] \"POST /api/login HTTP/1.1\" 200 512\n172.16.0.1 - - [01/Jan/2024:10:00:08 +0000] \"GET /api/health HTTP/1.1\" 200 8\n192.168.1.10 - - [01/Jan/2024:10:00:09 +0000] \"GET /api/users HTTP/1.1\" 200 1234\n10.0.0.5 - - [01/Jan/2024:10:00:10 +0000] \"POST /api/login HTTP/1.1\" 401 89\n172.16.0.1 - - [01/Jan/2024:10:00:11 +0000] \"GET /api/users HTTP/1.1\" 500 0\n10.0.0.5 - - [01/Jan/2024:10:00:12 +0000] \"GET /api/data HTTP/1.1\" 403 0\n"
+
+[[exercises]]
+id = "log-processing.8"
+difficulty = "advanced"
+question = """An application writes structured logs to `app.log` in the format: `TIMESTAMP LEVEL [SERVICE] message`. You suspect the `payments` service is generating errors. Print each unique error message from the `payments` service, sorted alphabetically, with duplicates removed."""
+expected_output = "card declined\nconnection timeout\ninsufficient funds\n"
+hints = [
+  "grep '[payments]' filters lines for the payments service",
+  "grep 'ERROR' further narrows to errors",
+  "awk '{$1=$2=$3=\"\"; sub(/^ +/,\"\"); print}' removes the first 3 fields (timestamp, level, service)",
+  "sort -u removes duplicates",
+]
+solution = "grep '\\[payments\\]' app.log | grep 'ERROR' | awk '{$1=$2=$3=\"\"; sub(/^ +/,\"\"); print}' | sort -u"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "app.log"
+content = "2024-01-01T10:00:01 INFO [api] request received\n2024-01-01T10:00:02 ERROR [payments] connection timeout\n2024-01-01T10:00:03 INFO [api] response sent\n2024-01-01T10:00:04 ERROR [payments] card declined\n2024-01-01T10:00:05 INFO [auth] user login\n2024-01-01T10:00:06 ERROR [payments] connection timeout\n2024-01-01T10:00:07 INFO [api] request received\n2024-01-01T10:00:08 ERROR [payments] insufficient funds\n2024-01-01T10:00:09 INFO [api] response sent\n2024-01-01T10:00:10 ERROR [payments] card declined\n2024-01-01T10:00:11 INFO [auth] user logout\n2024-01-01T10:00:12 INFO [api] request received\n"

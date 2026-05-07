@@ -10,40 +10,59 @@ struct ModuleIndex {
 
 // command_modules.LOADING.1 — all TOML files embedded at compile time
 const MODULES_TOML: &str = include_str!("../../content/modules.toml");
+const LS_TOML: &str = include_str!("../../content/ls.toml");
+const CAT_TOML: &str = include_str!("../../content/cat.toml");
+const HEAD_TOML: &str = include_str!("../../content/head.toml");
+const TAIL_TOML: &str = include_str!("../../content/tail.toml");
 const GREP_TOML: &str = include_str!("../../content/grep.toml");
-const AWK_TOML: &str = include_str!("../../content/awk.toml");
-const SED_TOML: &str = include_str!("../../content/sed.toml");
 const FIND_TOML: &str = include_str!("../../content/find.toml");
-const XARGS_TOML: &str = include_str!("../../content/xargs.toml");
 const CUT_TOML: &str = include_str!("../../content/cut.toml");
 const SORT_TOML: &str = include_str!("../../content/sort.toml");
 const UNIQ_TOML: &str = include_str!("../../content/uniq.toml");
-const TR_TOML: &str = include_str!("../../content/tr.toml");
-// more_modules.CONTENT.1 — new modules
 const WC_TOML: &str = include_str!("../../content/wc.toml");
+const TR_TOML: &str = include_str!("../../content/tr.toml");
+const SED_TOML: &str = include_str!("../../content/sed.toml");
+const AWK_TOML: &str = include_str!("../../content/awk.toml");
+const PASTE_TOML: &str = include_str!("../../content/paste.toml");
+const TEE_TOML: &str = include_str!("../../content/tee.toml");
+const DIFF_TOML: &str = include_str!("../../content/diff.toml");
+const XARGS_TOML: &str = include_str!("../../content/xargs.toml");
 const TAR_TOML: &str = include_str!("../../content/tar.toml");
 const CHMOD_TOML: &str = include_str!("../../content/chmod.toml");
+const BC_TOML: &str = include_str!("../../content/bc.toml");
 const GIT_TOML: &str = include_str!("../../content/git.toml");
 const JQ_TOML: &str = include_str!("../../content/jq.toml");
 const MAKE_TOML: &str = include_str!("../../content/make.toml");
+const LOG_PROCESSING_TOML: &str = include_str!("../../content/log-processing.toml");
+const TEXT_PROCESSING_TOML: &str = include_str!("../../content/text-processing.toml");
 
 fn raw_by_name(name: &str) -> Option<&'static str> {
     match name {
+        "ls" => Some(LS_TOML),
+        "cat" => Some(CAT_TOML),
+        "head" => Some(HEAD_TOML),
+        "tail" => Some(TAIL_TOML),
         "grep" => Some(GREP_TOML),
-        "awk" => Some(AWK_TOML),
-        "sed" => Some(SED_TOML),
         "find" => Some(FIND_TOML),
-        "xargs" => Some(XARGS_TOML),
         "cut" => Some(CUT_TOML),
         "sort" => Some(SORT_TOML),
         "uniq" => Some(UNIQ_TOML),
-        "tr" => Some(TR_TOML),
         "wc" => Some(WC_TOML),
+        "tr" => Some(TR_TOML),
+        "sed" => Some(SED_TOML),
+        "awk" => Some(AWK_TOML),
+        "paste" => Some(PASTE_TOML),
+        "tee" => Some(TEE_TOML),
+        "diff" => Some(DIFF_TOML),
+        "xargs" => Some(XARGS_TOML),
         "tar" => Some(TAR_TOML),
         "chmod" => Some(CHMOD_TOML),
+        "bc" => Some(BC_TOML),
         "git" => Some(GIT_TOML),
         "jq" => Some(JQ_TOML),
         "make" => Some(MAKE_TOML),
+        "log-processing" => Some(LOG_PROCESSING_TOML),
+        "text-processing" => Some(TEXT_PROCESSING_TOML),
         _ => None,
     }
 }

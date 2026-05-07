@@ -1,0 +1,141 @@
+[module]
+name = "head"
+description = "Print the first N lines of a file — preview data and extract headers"
+version = 1
+
+[intro]
+text = """
+## Why head matters
+
+Before you run any serious processing on a file — feeding it to `awk`, writing a `grep` pattern, piping it through `jq` — you need to know what the file looks like. `head` is the fastest way to answer that question without loading the entire file into memory or waiting for an editor to open.
+
+In real engineering work `head` earns its keep in several concrete ways:
+
+- **Understand the format immediately.** Is it CSV or TSV? JSON-lines or pretty-printed JSON? Does it have a header row? One call to `head` tells you, even on a 10 GB file.
+- **Extract schema without tooling.** `head -n 1 data.csv` gives you the column names before you write a single line of Python or SQL.
+- **Sample a log before writing a filter.** Glancing at the first few lines of an unfamiliar log format saves you from writing a `grep` pattern against the wrong field.
+- **Verify a file after download or generation.** When a script writes an output file, `head` confirms the first few lines look sane before the rest of the pipeline consumes it.
+- **Performance.** On multi-gigabyte files, `head` exits as soon as it has enough lines, so it's nearly instant. `cat` + scroll is far slower.
+
+## Key flags
+
+- `-n N` — print the first N lines (default is 10 if omitted).
+- `-n 1` — a common shorthand: just the first line. Perfect for CSV headers.
+- `-c N` — print the first N **bytes** instead of lines. Useful for binary file inspection or slicing fixed-width records.
+
+## Real-world workflows
+
+**Check CSV column names before piping to awk:**
+```
+head -n 1 sales_data.csv
+```
+Tells you field positions so your `awk '{print $3}'` targets the right column.
+
+**Sample a log before writing a grep filter:**
+```
+head -n 20 application.log
+```
+See the timestamp format, log level position, and message structure before crafting a pattern.
+
+**Verify file format after download:**
+```
+head -n 5 dataset.jsonl
+```
+Confirm it's one JSON object per line, not a JSON array, before running `jq`.
+"""
+
+[[examples]]
+title = "View the first 10 lines (default)"
+description = "head with no flags prints the first 10 lines of the file"
+command = "head server.log"
+output = "2024-01-01 10:00:01 INFO request 1\n2024-01-01 10:00:02 INFO request 2\n2024-01-01 10:00:03 INFO request 3\n2024-01-01 10:00:04 INFO request 4\n2024-01-01 10:00:05 INFO request 5\n2024-01-01 10:00:06 INFO request 6\n2024-01-01 10:00:07 INFO request 7\n2024-01-01 10:00:08 INFO request 8\n2024-01-01 10:00:09 INFO request 9\n2024-01-01 10:00:10 INFO request 10\n"
+
+[[examples]]
+title = "Extract the header row of a CSV"
+description = "Use -n 1 to print only the first line — the column names"
+command = "head -n 1 employees.csv"
+output = "name,department,salary\n"
+
+[[exercises]]
+id = "head.1"
+difficulty = "beginner"
+question = """The file `server.log` contains 15 log entries. Display the first 10 lines (the default behaviour of head)."""
+expected_output = "2024-01-01 10:00:01 INFO request 1\n2024-01-01 10:00:02 INFO request 2\n2024-01-01 10:00:03 INFO request 3\n2024-01-01 10:00:04 INFO request 4\n2024-01-01 10:00:05 INFO request 5\n2024-01-01 10:00:06 INFO request 6\n2024-01-01 10:00:07 INFO request 7\n2024-01-01 10:00:08 INFO request 8\n2024-01-01 10:00:09 INFO request 9\n2024-01-01 10:00:10 INFO request 10\n"
+hints = [
+  "head prints the first 10 lines by default",
+  "Try: head server.log",
+]
+solution = "head server.log"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "server.log"
+content = "2024-01-01 10:00:01 INFO request 1\n2024-01-01 10:00:02 INFO request 2\n2024-01-01 10:00:03 INFO request 3\n2024-01-01 10:00:04 INFO request 4\n2024-01-01 10:00:05 INFO request 5\n2024-01-01 10:00:06 INFO request 6\n2024-01-01 10:00:07 INFO request 7\n2024-01-01 10:00:08 INFO request 8\n2024-01-01 10:00:09 INFO request 9\n2024-01-01 10:00:10 INFO request 10\n2024-01-01 10:00:11 INFO request 11\n2024-01-01 10:00:12 INFO request 12\n2024-01-01 10:00:13 INFO request 13\n2024-01-01 10:00:14 INFO request 14\n2024-01-01 10:00:15 INFO request 15\n"
+
+[[exercises]]
+id = "head.2"
+difficulty = "beginner"
+question = """The file `access.log` records incoming HTTP requests. Print only the first 3 lines."""
+expected_output = "192.168.1.10 GET /api/users 200\n192.168.1.20 POST /api/login 401\n10.0.0.5 GET /api/data 200\n"
+hints = [
+  "Use the -n flag to specify a line count",
+  "Try: head -n 3 access.log",
+]
+solution = "head -n 3 access.log"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "access.log"
+content = "192.168.1.10 GET /api/users 200\n192.168.1.20 POST /api/login 401\n10.0.0.5 GET /api/data 200\n172.16.0.1 GET /health 200\n10.0.0.1 DELETE /api/user 204\n"
+
+[[exercises]]
+id = "head.3"
+difficulty = "beginner"
+question = """The file `employees.csv` has a header row followed by data. Extract just the column header row."""
+expected_output = "name,department,salary\n"
+hints = [
+  "The header is always the first line of a CSV",
+  "Use head with -n 1 to print exactly one line",
+  "Try: head -n 1 employees.csv",
+]
+solution = "head -n 1 employees.csv"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "employees.csv"
+content = "name,department,salary\nAlice,Engineering,95000\nBob,Marketing,72000\nCharlie,Engineering,88000\n"
+
+[[exercises]]
+id = "head.4"
+difficulty = "intermediate"
+question = """The file `events.jsonl` is a JSON-lines log where each line is a JSON object. Preview the first 5 entries to understand the schema before processing the full file."""
+expected_output = "{\"ts\":\"10:00:01\",\"level\":\"INFO\",\"msg\":\"start\"}\n{\"ts\":\"10:00:02\",\"level\":\"ERROR\",\"msg\":\"timeout\"}\n{\"ts\":\"10:00:03\",\"level\":\"INFO\",\"msg\":\"retry\"}\n{\"ts\":\"10:00:04\",\"level\":\"WARN\",\"msg\":\"slow\"}\n{\"ts\":\"10:00:05\",\"level\":\"INFO\",\"msg\":\"ok\"}\n"
+hints = [
+  "JSON-lines files have one JSON object per line",
+  "Use head -n 5 to limit output to 5 lines",
+  "Try: head -n 5 events.jsonl",
+]
+solution = "head -n 5 events.jsonl"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "events.jsonl"
+content = "{\"ts\":\"10:00:01\",\"level\":\"INFO\",\"msg\":\"start\"}\n{\"ts\":\"10:00:02\",\"level\":\"ERROR\",\"msg\":\"timeout\"}\n{\"ts\":\"10:00:03\",\"level\":\"INFO\",\"msg\":\"retry\"}\n{\"ts\":\"10:00:04\",\"level\":\"WARN\",\"msg\":\"slow\"}\n{\"ts\":\"10:00:05\",\"level\":\"INFO\",\"msg\":\"ok\"}\n{\"ts\":\"10:00:06\",\"level\":\"ERROR\",\"msg\":\"fail\"}\n{\"ts\":\"10:00:07\",\"level\":\"INFO\",\"msg\":\"done\"}\n"
+
+[[exercises]]
+id = "head.5"
+difficulty = "advanced"
+question = """The file `metrics.csv` has an unknown number of columns. Determine the column count by inspecting the header row."""
+expected_output = "6\n"
+hints = [
+  "Extract the header with head -n 1, then split on commas",
+  "tr ',' '\\n' converts each comma to a newline, making each field its own line",
+  "Count the resulting lines with wc -l and strip spaces with tr -d ' '",
+  "Try: head -n 1 metrics.csv | tr ',' '\\n' | wc -l | tr -d ' '",
+]
+solution = "head -n 1 metrics.csv | tr ',' '\\n' | wc -l | tr -d ' '"
+match_mode = "normalized"
+
+[[exercises.fixtures]]
+filename = "metrics.csv"
+content = "timestamp,cpu,mem,disk,net,requests\n2024-01-01,45,62,71,12,1024\n"

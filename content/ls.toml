@@ -1,0 +1,247 @@
+[module]
+name = "ls"
+description = "List directory contents — navigate the filesystem and audit file state"
+version = 1
+
+[intro]
+text = """
+## Why ls matters
+
+`ls` is almost always the first command you run in an unfamiliar directory. When you SSH into a server, clone a repo, or land in a production container, `ls` is how you orient yourself: what files exist, how they're named, whether config files are present, whether logs have accumulated.
+
+In day-to-day engineering work `ls` does more than just list names. With the right flags you can:
+- Spot whether `.env` or other secret files are accidentally present before a commit
+- Check timestamps after a `git pull` to see which files actually changed
+- Find the largest files eating disk space on a server
+- Confirm that a deployment wrote the expected output files
+- Understand a project's structure at a glance before opening any file
+
+Because `ls` output goes to stdout it composes naturally with pipelines: `ls | wc -l` counts files, `ls *.log | xargs rm` bulk-deletes logs, `ls -t | head -1` finds the most recently modified file.
+
+## Key flags
+
+- `-l` — long format: shows permissions, owner, group, size (bytes), modification date, and name. Essential for auditing who owns a file and whether it's executable.
+- `-a` — show **all** entries including `.` (current dir) and `..` (parent dir) and all dotfiles.
+- `-A` — like `-a` but omits `.` and `..`. Almost always what you want when you need hidden files.
+- `-h` — human-readable sizes when combined with `-l`: prints `4.2M` instead of `4194304`.
+- `-t` — sort by modification time, newest first. Pair with `head` to find the most recently touched file after a deployment or `git pull`.
+- `-S` — sort by file size, largest first. Useful for finding what's eating disk space.
+- `-r` — reverse the sort order. Combined with `-t` gives oldest-first; combined with `-S` gives smallest-first.
+- Flag combinations: `ls -lhS` (long, human-readable, by size), `ls -ltr` (long, by time, oldest first — good for reading a deployment sequence).
+
+## Real-world workflows
+
+**After a git pull — see what actually changed:**
+```
+ls -lt | head -20
+```
+Sorts by modification time so the files touched by the pull appear at the top.
+
+**Checking for accidentally committed secrets:**
+```
+ls -A | grep -E '^\\.env'
+```
+Lists hidden files and filters for `.env` variants before you push to a public repo.
+
+**Disk auditing on a server:**
+```
+ls -lhS /var/log | head -10
+```
+Shows the ten largest log files in `/var/log` with human-readable sizes so you know what to rotate or delete.
+"""
+
+[[examples]]
+title = "List files in current directory"
+description = "Show all non-hidden files in the working directory, one per line"
+command = "ls"
+output = "README.md\napp.py\nconfig.yaml\nmain.py\n"
+
+[[examples]]
+title = "Show hidden dotfiles"
+description = "List all files including dotfiles, but exclude . and .."
+command = "ls -A"
+output = ".env\n.gitignore\napp.py\n"
+
+[[exercises]]
+id = "ls.1"
+difficulty = "beginner"
+question = """List the files in the current project directory."""
+expected_output = "README.md\napp.py\nconfig.yaml\nmain.py\n"
+hints = [
+  "ls lists the current directory by default",
+  "Try: ls",
+]
+solution = "ls"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "README.md"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "app.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "config.yaml"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "main.py"
+content = "# placeholder\n"
+
+[[exercises]]
+id = "ls.2"
+difficulty = "beginner"
+question = """The project directory contains regular files and hidden dotfiles (files starting with `.`). List ALL files including hidden ones, but exclude `.` and `..`."""
+expected_output = ".env\n.gitignore\napp.py\n"
+hints = [
+  "Regular ls hides files whose names start with a dot",
+  "The -A flag shows hidden files but skips . and ..",
+  "Try: ls -A",
+]
+solution = "ls -A"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "app.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = ".env"
+content = "DATABASE_URL=localhost\n"
+
+[[exercises.fixtures]]
+filename = ".gitignore"
+content = "*.pyc\n__pycache__/\n"
+
+[[exercises]]
+id = "ls.3"
+difficulty = "beginner"
+question = """The directory contains Python source files alongside configuration and dependency files. List only the Python (`.py`) files."""
+expected_output = "auth.py\nmain.py\nutils.py\n"
+hints = [
+  "ls accepts glob patterns to filter by extension",
+  "Try: ls *.py",
+]
+solution = "ls *.py"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "auth.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "main.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "config.yaml"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "requirements.txt"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "utils.py"
+content = "# placeholder\n"
+
+[[exercises]]
+id = "ls.4"
+difficulty = "intermediate"
+question = """Count how many files are in the current directory. Print just the number."""
+expected_output = "5\n"
+hints = [
+  "Pipe ls output into wc -l to count lines",
+  "BSD wc adds leading spaces — strip them with tr -d ' '",
+  "Try: ls | wc -l | tr -d ' '",
+]
+solution = "ls | wc -l | tr -d ' '"
+match_mode = "normalized"
+
+[[exercises.fixtures]]
+filename = "file1.txt"
+content = "data\n"
+
+[[exercises.fixtures]]
+filename = "file2.txt"
+content = "data\n"
+
+[[exercises.fixtures]]
+filename = "file3.txt"
+content = "data\n"
+
+[[exercises.fixtures]]
+filename = "file4.txt"
+content = "data\n"
+
+[[exercises.fixtures]]
+filename = "file5.txt"
+content = "data\n"
+
+[[exercises]]
+id = "ls.5"
+difficulty = "intermediate"
+question = """List the files in the current directory in reverse alphabetical order (Z → A)."""
+expected_output = "gamma.txt\ndelta.txt\nbeta.txt\nalpha.txt\n"
+hints = [
+  "ls outputs in alphabetical order by default",
+  "Pipe through sort -r to reverse the order",
+  "Try: ls | sort -r",
+]
+solution = "ls | sort -r"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "alpha.txt"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "beta.txt"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "gamma.txt"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "delta.txt"
+content = "# placeholder\n"
+
+[[exercises]]
+id = "ls.6"
+difficulty = "advanced"
+question = """You're checking test coverage for a project. Count the number of test files (files whose names start with `test_` and end in `.py`)."""
+expected_output = "3\n"
+hints = [
+  "Use a glob pattern to match files starting with test_ and ending in .py",
+  "Pipe the result to wc -l and strip leading spaces with tr -d ' '",
+  "Try: ls test_*.py | wc -l | tr -d ' '",
+]
+solution = "ls test_*.py | wc -l | tr -d ' '"
+match_mode = "normalized"
+
+[[exercises.fixtures]]
+filename = "test_auth.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "test_api.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "test_db.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "auth.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "api.py"
+content = "# placeholder\n"
+
+[[exercises.fixtures]]
+filename = "conftest.py"
+content = "# placeholder\n"

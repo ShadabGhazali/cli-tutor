@@ -1,0 +1,124 @@
+[module]
+name = "paste"
+description = "Merge lines from multiple files side by side"
+version = 1
+
+[intro]
+text = """
+## Why paste matters
+
+`paste` is the complement of `cut`. Where `cut` extracts columns from a table, `paste` assembles columns into one. In data processing pipelines you often generate each column independently — one script fetches names, another calculates scores, a third pulls departments — and then need to combine them into a single table. `paste` does exactly this with no scripting.
+
+It's also the standard tool for converting a vertical list into a single delimited string. When you need to build a SQL `WHERE id IN (1, 2, 3)` clause from a file of IDs, or pass a comma-separated tag list to an API, `paste -sd,` is the one-liner that gets it done.
+
+## Basic Syntax
+
+```
+paste [OPTIONS] FILE [FILE...]
+```
+
+## Key Flags
+
+- `-d DELIM` — use DELIM as the field separator instead of the default tab. Use `-d,` for CSV output.
+- `-s` — serial mode: instead of merging files line-by-line in parallel, merge all lines of each file in sequence. Combined with `-d`, this converts a newline-separated list into a single delimited string.
+
+## Real-world workflows
+
+- **Building CSVs**: generate each column separately, then combine with `paste -d,`
+- **SQL IN clauses**: `paste -sd, ids.txt` produces `1,2,3` ready for `WHERE id IN (...)`
+- **Config assembly**: combine separately-maintained key and value files into `key=value` pairs with `paste -d=`
+"""
+
+[[examples]]
+title = "Merge two files side by side"
+description = "Combine a name file and a score file into tab-separated columns"
+command = "paste names.txt scores.txt"
+output = "alice\t95\nbob\t87\n"
+
+[[examples]]
+title = "Serialize a list to one line"
+description = "Convert a newline-separated list of IDs into a comma-separated string"
+command = "paste -sd, ids.txt"
+output = "101,102,103,104\n"
+
+[[exercises]]
+id = "paste.1"
+difficulty = "beginner"
+question = """You have test results split across two files: `names.txt` with student names and `scores.txt` with their scores. Merge them side by side with the default tab separator."""
+expected_output = "alice\t95\nbob\t87\ncharlie\t72\n"
+hints = [
+  "paste merges files line by line using tab by default",
+  "Try: paste names.txt scores.txt",
+]
+solution = "paste names.txt scores.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "names.txt"
+content = "alice\nbob\ncharlie\n"
+
+[[exercises.fixtures]]
+filename = "scores.txt"
+content = "95\n87\n72\n"
+
+[[exercises]]
+id = "paste.2"
+difficulty = "beginner"
+question = """Combine `names.txt` and `departments.txt` into a CSV using comma as the delimiter."""
+expected_output = "alice,Engineering\nbob,Marketing\ncharlie,HR\n"
+hints = [
+  "Use -d, to set the delimiter to a comma",
+  "Try: paste -d, names.txt departments.txt",
+]
+solution = "paste -d, names.txt departments.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "names.txt"
+content = "alice\nbob\ncharlie\n"
+
+[[exercises.fixtures]]
+filename = "departments.txt"
+content = "Engineering\nMarketing\nHR\n"
+
+[[exercises]]
+id = "paste.3"
+difficulty = "intermediate"
+question = """Convert `tags.txt` (one tag per line) into a single comma-separated string — the format needed for many API calls and config values."""
+expected_output = "python,rust,go,java,javascript\n"
+hints = [
+  "-s serializes all lines of a file into one line",
+  "-d sets the delimiter character",
+  "Try: paste -sd, tags.txt",
+]
+solution = "paste -sd, tags.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "tags.txt"
+content = "python\nrust\ngo\njava\njavascript\n"
+
+[[exercises]]
+id = "paste.4"
+difficulty = "advanced"
+question = """Three files each hold one column of employee data. Build a complete CSV with a header row by combining the files with `paste`, preceded by an `echo` for the header."""
+expected_output = "name,department,salary\nAlice,Engineering,95000\nBob,Marketing,72000\nCharlie,HR,65000\n"
+hints = [
+  "echo the header line first, then paste the three column files",
+  "Use && to sequence the two commands so their output concatenates",
+  "Try: echo \"name,department,salary\" && paste -d, col_name.txt col_dept.txt col_salary.txt",
+]
+solution = "echo \"name,department,salary\" && paste -d, col_name.txt col_dept.txt col_salary.txt"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "col_name.txt"
+content = "Alice\nBob\nCharlie\n"
+
+[[exercises.fixtures]]
+filename = "col_dept.txt"
+content = "Engineering\nMarketing\nHR\n"
+
+[[exercises.fixtures]]
+filename = "col_salary.txt"
+content = "95000\n72000\n65000\n"

@@ -1,0 +1,103 @@
+[module]
+name = "tee"
+description = "Fork pipeline output to a file and stdout simultaneously"
+version = 1
+
+[intro]
+text = """
+## Why tee matters
+
+Every pipeline you write is a one-shot transformation — the output flows through and is gone. But in real engineering work you often need to **both** save output and continue processing it. Without `tee`, you'd have to run the pipeline twice: once to save results, once to continue. That's slow, fragile, and produces inconsistent results if the input changes between runs.
+
+`tee` solves this by acting as a T-junction in your pipeline: it passes data through unchanged to stdout while simultaneously writing a copy to a file.
+
+In CI/CD pipelines and deployment scripts, `tee` is how you log every step to a file while still showing live output on the terminal. In debugging sessions, you tap intermediate pipeline results to inspect them without breaking the flow.
+
+## Basic Syntax
+
+```
+command | tee [OPTIONS] FILE
+```
+
+## Key Flags
+
+- `-a` — append to the file instead of overwriting it. Essential when building up a log file across multiple steps.
+
+## Real-world use cases
+
+- **CI/CD build logs**: `make build 2>&1 | tee build.log` — capture the full build output to a file while printing it live
+- **Debugging pipelines**: tap the middle of a pipeline to inspect intermediate data: `cmd1 | tee debug.txt | cmd2`
+- **Audit logging**: record every command's output to an audit trail while continuing normal processing
+- **Multi-step logs**: use `tee -a` to append each pipeline stage's output to one cumulative log file
+"""
+
+[[examples]]
+title = "Save and display simultaneously"
+description = "Write output to a file while also printing it to the terminal"
+command = "echo \"build passed\" | tee result.log"
+output = "build passed\n"
+
+[[examples]]
+title = "Tap a pipeline midway"
+description = "Save intermediate results without breaking the pipeline"
+command = "grep 'ERROR' app.log | tee errors.txt | wc -l | tr -d ' '"
+output = "3\n"
+
+[[exercises]]
+id = "tee.1"
+difficulty = "beginner"
+question = """Use `tee` to write the text "deployment started" to `deploy.log` and also display it. Then verify by printing `deploy.log`."""
+expected_output = "deployment started\ndeployment started\n"
+hints = [
+  "tee writes to both stdout and a file",
+  "Try: echo \"deployment started\" | tee deploy.log && cat deploy.log",
+]
+solution = "echo \"deployment started\" | tee deploy.log && cat deploy.log"
+match_mode = "exact"
+
+[[exercises]]
+id = "tee.2"
+difficulty = "beginner"
+question = """The file `errors.txt` contains mixed log lines. Filter only the lines containing 'ERROR', save them to `error_list.txt` with `tee`, AND count how many there are. Print just the count."""
+expected_output = "3\n"
+hints = [
+  "Pipe grep into tee, then pipe tee into wc -l",
+  "tee passes data through, so you can keep piping after it",
+  "Try: grep 'ERROR' errors.txt | tee error_list.txt | wc -l | tr -d ' '",
+]
+solution = "grep 'ERROR' errors.txt | tee error_list.txt | wc -l | tr -d ' '"
+match_mode = "normalized"
+
+[[exercises.fixtures]]
+filename = "errors.txt"
+content = "ERROR: timeout\nWARN: retrying\nERROR: disk full\nINFO: recovered\nERROR: oom\n"
+
+[[exercises]]
+id = "tee.3"
+difficulty = "intermediate"
+question = """Build a multi-step deployment log using `tee -a` (append mode). Write "step 1: build", "step 2: test", and "step 3: deploy" to `build.log` one at a time using append mode, suppressing intermediate stdout. Then print the final log."""
+expected_output = "step 1: build\nstep 2: test\nstep 3: deploy\n"
+hints = [
+  "tee -a appends instead of overwriting",
+  "Redirect tee's stdout to /dev/null to suppress intermediate output",
+  "Try: echo \"step 1: build\" | tee build.log > /dev/null && echo \"step 2: test\" | tee -a build.log > /dev/null && echo \"step 3: deploy\" | tee -a build.log > /dev/null && cat build.log",
+]
+solution = "echo \"step 1: build\" | tee build.log > /dev/null && echo \"step 2: test\" | tee -a build.log > /dev/null && echo \"step 3: deploy\" | tee -a build.log > /dev/null && cat build.log"
+match_mode = "exact"
+
+[[exercises]]
+id = "tee.4"
+difficulty = "advanced"
+question = """Process `events.txt` through a pipeline: save ALL events to `all_events.log` with `tee`, while also counting just the ERROR events. Print the error count."""
+expected_output = "2\n"
+hints = [
+  "Insert tee right after cat to save the full stream before filtering",
+  "After tee, pipe to grep 'ERROR' and then wc -l",
+  "Try: cat events.txt | tee all_events.log | grep 'ERROR' | wc -l | tr -d ' '",
+]
+solution = "cat events.txt | tee all_events.log | grep 'ERROR' | wc -l | tr -d ' '"
+match_mode = "normalized"
+
+[[exercises.fixtures]]
+filename = "events.txt"
+content = "USER_LOGIN alice\nPAGE_VIEW home\nUSER_LOGIN bob\nERROR payment_failed\nPAGE_VIEW checkout\nUSER_LOGIN carol\nERROR timeout\nPAGE_VIEW profile\n"

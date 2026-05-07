@@ -318,16 +318,15 @@ fn scroll_down_increments() {
 // --- Module count sanity ---
 
 #[test]
-fn app_starts_with_fifteen_modules() {
-    // more_modules.MODULES.1 — 15 modules total
+fn app_starts_with_twenty_five_modules() {
     let app = make_app();
-    assert_eq!(app.modules.len(), 15);
+    assert_eq!(app.modules.len(), 25);
 }
 
 #[test]
-fn first_module_is_grep() {
+fn first_module_is_ls() {
     let app = make_app();
-    assert_eq!(app.current_module().module.name, "grep");
+    assert_eq!(app.current_module().module.name, "ls");
 }
 
 // --- Word jump ---
