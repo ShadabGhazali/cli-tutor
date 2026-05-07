@@ -115,13 +115,13 @@ fn render_footer(app: &App, frame: &mut Frame, area: Rect) {
     let nc = app.config.no_color;
     let hints = match app.current_view {
         ContentView::Intro | ContentView::Examples => {
-            " ↑↓: Module  Tab: Next view  PgUp/PgDn: Scroll  /: Search  d: Filter  q: Quit"
+            " ↑↓: Module  Tab: Next view  ^U/^D: Scroll  /: Search  d: Filter  q: Quit"
         }
         ContentView::Exercise => {
-            " Enter: Submit  ↑↓: History  PgUp/PgDn: Scroll  ^T: Hint  ^S: Solution  ^N/^P: Next/Prev  ^R: Reset  Esc: Back"
+            " Enter: Submit  ↑↓: History  ^U/^D: Scroll  ^T: Hint  ^S: Solution  ^N/^P: Next/Prev  ^R: Reset  Esc: Back"
         }
         ContentView::FreePractice => {
-            " Enter: Run  ↑↓: History  PgUp/PgDn: Scroll  ^L: Clear  Tab/Esc: Back"
+            " Enter: Run  ↑↓: History  ^U/^D: Scroll  ^L: Clear  Tab/Esc: Back"
         }
     };
 
