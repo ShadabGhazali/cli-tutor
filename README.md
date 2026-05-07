@@ -156,7 +156,7 @@ These modules teach you to **combine tools in pipelines** to solve complete engi
 |-----|--------|
 | `↑` `↓` | Switch module |
 | `Tab` | Cycle views: Intro → Examples → Exercise → Free Practice |
-| `PgUp` `PgDn` | Scroll content |
+| `Ctrl+U` `Ctrl+D` | Scroll content |
 | `/` | Fuzzy search modules |
 | `d` | Cycle difficulty filter (All → Beginner → Intermediate → Advanced) |
 | `P` | Progress summary |
@@ -168,7 +168,7 @@ These modules teach you to **combine tools in pipelines** to solve complete engi
 |-----|--------|
 | `Enter` | Submit command |
 | `↑` `↓` | Browse command history |
-| `PgUp` `PgDn` | Scroll output |
+| `Ctrl+U` `Ctrl+D` | Scroll output |
 | `←` `→` | Move cursor |
 | `Ctrl+←` `Ctrl+→` | Jump by word |
 | `Ctrl+N` `Ctrl+P` | Next / previous exercise |
@@ -185,7 +185,7 @@ These modules teach you to **combine tools in pipelines** to solve complete engi
 |-----|--------|
 | `Enter` | Run command |
 | `↑` `↓` | Browse command history |
-| `PgUp` `PgDn` | Scroll output |
+| `Ctrl+U` `Ctrl+D` | Scroll output |
 | `Ctrl+L` | Clear output |
 | `Esc` | Back to browse |
 

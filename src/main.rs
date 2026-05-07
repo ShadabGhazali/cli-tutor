@@ -173,8 +173,8 @@ fn handle_browse_keys(app: &mut App, key: KeyEvent) {
         (KeyModifiers::NONE, KeyCode::Tab) => app.cycle_view(),
         (KeyModifiers::NONE, KeyCode::Up) => app.select_prev_module(),
         (KeyModifiers::NONE, KeyCode::Down) => app.select_next_module(),
-        (KeyModifiers::NONE, KeyCode::PageUp) => app.scroll_up(),
-        (KeyModifiers::NONE, KeyCode::PageDown) => app.scroll_down(),
+        (KeyModifiers::CONTROL, KeyCode::Char('u')) => app.scroll_up(),
+        (KeyModifiers::CONTROL, KeyCode::Char('d')) => app.scroll_down(),
         _ => {}
     }
 }
@@ -200,9 +200,9 @@ fn handle_exercise_keys(app: &mut App, key: KeyEvent) {
         // command_history.HISTORY.3 — ↑/↓ navigate history
         (KeyModifiers::NONE, KeyCode::Up) => app.history_prev(),
         (KeyModifiers::NONE, KeyCode::Down) => app.history_next(),
-        // PgUp/PgDn for output scroll
-        (KeyModifiers::NONE, KeyCode::PageUp) => app.scroll_up(),
-        (KeyModifiers::NONE, KeyCode::PageDown) => app.scroll_down(),
+        // Ctrl+U/D for output scroll (vim/less convention)
+        (KeyModifiers::CONTROL, KeyCode::Char('u')) => app.scroll_up(),
+        (KeyModifiers::CONTROL, KeyCode::Char('d')) => app.scroll_down(),
 
         // All printable characters go to input
         (KeyModifiers::NONE, KeyCode::Char(c)) => app.input_push(c),
@@ -230,8 +230,9 @@ fn handle_free_practice_keys(app: &mut App, key: KeyEvent) {
 
         (KeyModifiers::NONE, KeyCode::Up) => app.history_prev(),
         (KeyModifiers::NONE, KeyCode::Down) => app.history_next(),
-        (KeyModifiers::NONE, KeyCode::PageUp) => app.scroll_up(),
-        (KeyModifiers::NONE, KeyCode::PageDown) => app.scroll_down(),
+        // Ctrl+U/D for output scroll (vim/less convention)
+        (KeyModifiers::CONTROL, KeyCode::Char('u')) => app.scroll_up(),
+        (KeyModifiers::CONTROL, KeyCode::Char('d')) => app.scroll_down(),
 
         (KeyModifiers::NONE, KeyCode::Char(c)) => app.input_push(c),
         (KeyModifiers::SHIFT, KeyCode::Char(c)) => app.input_push(c),
