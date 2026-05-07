@@ -24,7 +24,31 @@ brew install ShadabGhazali/cli-tutor/cli-tutor
 cargo install cli-tutor
 ```
 
-**Pre-built binaries** — grab the latest from [Releases](https://github.com/ShadabGhazali/cli-tutor/releases) (macOS Intel/ARM, Linux, Windows).
+**Pre-built binary (no Rust required)**
+
+1. Go to the [Releases](https://github.com/ShadabGhazali/cli-tutor/releases) page and download the archive for your platform:
+   - `cli-tutor-aarch64-apple-darwin.tar.gz` — macOS Apple Silicon (M1/M2/M3)
+   - `cli-tutor-x86_64-apple-darwin.tar.gz` — macOS Intel
+   - `cli-tutor-x86_64-unknown-linux-musl.tar.gz` — Linux x86_64
+   - `cli-tutor-x86_64-pc-windows-msvc.zip` — Windows x86_64
+
+2. Extract and run:
+
+```sh
+# macOS / Linux
+tar xzf cli-tutor-*.tar.gz
+chmod +x cli-tutor
+./cli-tutor
+
+# macOS — if blocked by Gatekeeper, remove the quarantine flag first
+xattr -d com.apple.quarantine cli-tutor
+./cli-tutor
+```
+
+```powershell
+# Windows — extract the zip, then run in a terminal
+.\cli-tutor.exe
+```
 
 <details>
 <summary>Update an existing install</summary>
