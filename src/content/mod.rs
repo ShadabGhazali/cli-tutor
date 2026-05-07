@@ -23,6 +23,9 @@ const TR_TOML: &str = include_str!("../../content/tr.toml");
 const WC_TOML: &str = include_str!("../../content/wc.toml");
 const TAR_TOML: &str = include_str!("../../content/tar.toml");
 const CHMOD_TOML: &str = include_str!("../../content/chmod.toml");
+const GIT_TOML: &str = include_str!("../../content/git.toml");
+const JQ_TOML: &str = include_str!("../../content/jq.toml");
+const MAKE_TOML: &str = include_str!("../../content/make.toml");
 
 fn raw_by_name(name: &str) -> Option<&'static str> {
     match name {
@@ -38,6 +41,9 @@ fn raw_by_name(name: &str) -> Option<&'static str> {
         "wc" => Some(WC_TOML),
         "tar" => Some(TAR_TOML),
         "chmod" => Some(CHMOD_TOML),
+        "git" => Some(GIT_TOML),
+        "jq" => Some(JQ_TOML),
+        "make" => Some(MAKE_TOML),
         _ => None,
     }
 }

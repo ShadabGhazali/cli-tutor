@@ -317,10 +317,10 @@ fn scroll_down_increments() {
 // --- Module count sanity ---
 
 #[test]
-fn app_starts_with_twelve_modules() {
-    // more_modules.MODULES.1 — 12 modules total
+fn app_starts_with_fifteen_modules() {
+    // more_modules.MODULES.1 — 15 modules total
     let app = make_app();
-    assert_eq!(app.modules.len(), 12);
+    assert_eq!(app.modules.len(), 15);
 }
 
 #[test]

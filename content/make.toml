@@ -1,0 +1,153 @@
+[module]
+name = "make"
+description = "Automate build steps and tasks with Makefiles"
+version = 1
+
+[intro]
+text = """
+## What is make?
+
+`make` is a build automation tool. It reads a `Makefile` that defines targets, their dependencies, and the shell commands to run. Originally designed for compiling code, it is widely used today as a task runner for any project.
+
+## Makefile Syntax
+
+```makefile
+target: dependency1 dependency2
+\tcommand to run
+\tanother command
+```
+
+- Each **target** is a name you can run with `make <target>`
+- **Dependencies** listed after `:` must be built first
+- Commands must be indented with a **tab** (not spaces)
+- A line starting with `@` suppresses the command echo
+
+## Common Flags
+
+- `make` — run the first (default) target
+- `make <target>` — run a specific target
+- `make -s` — silent mode, suppress command echoing
+- `make VAR=value` — override a Makefile variable on the command line
+- `make -n` — dry run, print commands without running them
+
+## Variables
+
+```makefile
+VERSION = 1.0.0
+
+release:
+\t@echo "Releasing $(VERSION)"
+```
+
+Override at call time: `make release VERSION=2.0.0`
+
+## .PHONY
+
+Declare targets that are not files — prevents conflicts with files of the same name:
+
+```makefile
+.PHONY: build test clean
+```
+"""
+
+[[examples]]
+title = "Run a named target"
+description = "Execute the greet target from the Makefile"
+command = "make -s greet"
+output = "Hello!\n"
+
+[[examples]]
+title = "Override a variable"
+description = "Pass a variable on the command line to override the default"
+command = "make -s greet NAME=Alice"
+output = "Hello, Alice!\n"
+
+[[examples]]
+title = "Chained dependencies"
+description = "Running package also runs its dependencies in order"
+command = "make -s package"
+output = "Compiling...\nLinking...\nPackaging...\n"
+
+# ── exercises ──────────────────────────────────────────────────────────────────
+
+[[exercises]]
+id = "make.1"
+difficulty = "beginner"
+question = """A `Makefile` is already present. Run the `greet` target."""
+expected_output = "Hello, World!\n"
+hints = [
+  "Use make -s to suppress the recipe echo",
+  "Try: make -s greet",
+]
+solution = "make -s greet"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "Makefile"
+content = "greet:\n\t@echo \"Hello, World!\"\n"
+
+[[exercises]]
+id = "make.2"
+difficulty = "beginner"
+question = """Run `make` without specifying a target. The first target in the `Makefile` is the default."""
+expected_output = "Building project...\n"
+hints = [
+  "Running make with no arguments runs the first target defined in the Makefile",
+  "Try: make -s",
+]
+solution = "make -s"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "Makefile"
+content = "build:\n\t@echo \"Building project...\"\n"
+
+[[exercises]]
+id = "make.3"
+difficulty = "intermediate"
+question = """Run the `package` target. It depends on `build`, which depends on `compile`.
+Make runs dependencies in order before the requested target."""
+expected_output = "Compiling...\nBuilding...\nPackaging...\n"
+hints = [
+  "Dependencies run depth-first before the target that requires them",
+  "Try: make -s package",
+]
+solution = "make -s package"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "Makefile"
+content = "compile:\n\t@echo \"Compiling...\"\n\nbuild: compile\n\t@echo \"Building...\"\n\npackage: build\n\t@echo \"Packaging...\"\n"
+
+[[exercises]]
+id = "make.4"
+difficulty = "intermediate"
+question = """The `Makefile` defines a `VERSION` variable. Run the `version` target to print it."""
+expected_output = "v1.0.0\n"
+hints = [
+  "Variables in Makefiles are referenced with $(VAR_NAME)",
+  "Try: make -s version",
+]
+solution = "make -s version"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "Makefile"
+content = "VERSION = v1.0.0\n\nversion:\n\t@echo \"$(VERSION)\"\n"
+
+[[exercises]]
+id = "make.5"
+difficulty = "intermediate"
+question = """The `Makefile` has a `greet` target that uses a `NAME` variable (default: "User").
+Override `NAME` to "World" on the command line."""
+expected_output = "Hello, World!\n"
+hints = [
+  "Pass variables as KEY=value arguments after the target name",
+  "Try: make -s greet NAME=World",
+]
+solution = "make -s greet NAME=World"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "Makefile"
+content = "NAME = User\n\ngreet:\n\t@echo \"Hello, $(NAME)!\"\n"

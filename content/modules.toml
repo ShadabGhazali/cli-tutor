@@ -1,2 +1,2 @@
 # Module display order — command_modules.LOADING.5
-modules = ["grep", "awk", "sed", "find", "xargs", "cut", "sort", "uniq", "tr", "wc", "tar", "chmod"]
+modules = ["grep", "awk", "sed", "find", "xargs", "cut", "sort", "uniq", "tr", "wc", "tar", "chmod", "git", "jq", "make"]

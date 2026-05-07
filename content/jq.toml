@@ -1,0 +1,205 @@
+[module]
+name = "jq"
+description = "Query and transform JSON from the command line"
+version = 1
+
+[intro]
+text = """
+## What is jq?
+
+`jq` is a lightweight command-line JSON processor. It reads JSON input, applies a filter expression, and writes the result to stdout. It is the standard tool for working with JSON in shell scripts and modern API workflows.
+
+## Installation
+
+`jq` is not bundled with macOS or most Linux distributions. Install it first:
+
+```
+brew install jq          # macOS
+apt install jq           # Debian / Ubuntu
+```
+
+## Basic Syntax
+
+```
+jq '<filter>' file.json
+jq '<filter>'            # reads from stdin
+jq -r '<filter>'         # raw output (no JSON quoting on strings)
+```
+
+## Essential Filters
+
+- `.` — identity, pretty-print the whole input
+- `.field` — extract a field from an object
+- `.a.b` — nested field access
+- `.[]` — iterate over all elements of an array or object
+- `.[0]` — access element by index
+- `length` — length of a string, array, or object
+- `keys` — sorted array of an object's keys
+- `select(cond)` — keep only values where the condition is true
+- `map(expr)` — apply an expression to every element
+- `add` — sum an array of numbers (or concatenate strings/arrays)
+- `|` — pipe: pass the left result into the right filter
+
+## Flags
+
+- `-r` — raw strings (removes JSON quotes from string output)
+- `-c` — compact output (single line, no pretty-printing)
+- `-e` — exit with error if the result is false or null
+"""
+
+[[examples]]
+title = "Pretty-print JSON"
+description = "Identity filter reformats JSON with indentation"
+command = "echo '{\"name\":\"Alice\"}' | jq '.'"
+output = "{\n  \"name\": \"Alice\"\n}\n"
+
+[[examples]]
+title = "Extract a field"
+description = "Use -r to get a raw string without quotes"
+command = "echo '{\"name\":\"Alice\",\"age\":30}' | jq -r '.name'"
+output = "Alice\n"
+
+[[examples]]
+title = "Filter an array"
+description = "Iterate and select elements matching a condition"
+command = "echo '[1,2,3,4,5]' | jq '[.[] | select(. > 3)]'"
+output = "[\n  4,\n  5\n]\n"
+
+# ── exercises ──────────────────────────────────────────────────────────────────
+
+[[exercises]]
+id = "jq.1"
+difficulty = "beginner"
+question = """Pretty-print the contents of `user.json` using the identity filter."""
+expected_output = """{
+  "name": "Alice",
+  "age": 30
+}
+"""
+hints = [
+  "The identity filter in jq is simply a dot: .",
+  "Try: jq '.' user.json",
+]
+solution = "jq '.' user.json"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "user.json"
+content = "{\"name\":\"Alice\",\"age\":30}\n"
+
+[[exercises]]
+id = "jq.2"
+difficulty = "beginner"
+question = """Extract the `name` field from `user.json` as a plain string (no JSON quotes)."""
+expected_output = "Alice\n"
+hints = [
+  "Use the -r flag for raw string output",
+  "Try: jq -r '.name' user.json",
+]
+solution = "jq -r '.name' user.json"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "user.json"
+content = "{\"name\":\"Alice\",\"age\":30}\n"
+
+[[exercises]]
+id = "jq.3"
+difficulty = "beginner"
+question = """Extract the `city` from the nested `address` object in `user.json`."""
+expected_output = "London\n"
+hints = [
+  "Chain field accesses with dots: .address.city",
+  "Try: jq -r '.address.city' user.json",
+]
+solution = "jq -r '.address.city' user.json"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "user.json"
+content = "{\"name\":\"Alice\",\"address\":{\"city\":\"London\",\"zip\":\"W1A\"}}\n"
+
+[[exercises]]
+id = "jq.4"
+difficulty = "beginner"
+question = """Count how many items are in the `items` array in `cart.json`."""
+expected_output = "3\n"
+hints = [
+  "Pipe the array into the length filter",
+  "Try: jq '.items | length' cart.json",
+]
+solution = "jq '.items | length' cart.json"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "cart.json"
+content = "{\"items\":[\"apple\",\"banana\",\"cherry\"]}\n"
+
+[[exercises]]
+id = "jq.5"
+difficulty = "intermediate"
+question = """Print each user's name from the `users` array in `users.json`, one name per line."""
+expected_output = "Alice\nBob\nCarol\n"
+hints = [
+  "Use .[] to iterate the array, then access .name on each element",
+  "Try: jq -r '.users[].name' users.json",
+]
+solution = "jq -r '.users[].name' users.json"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "users.json"
+content = "{\"users\":[{\"name\":\"Alice\",\"age\":22},{\"name\":\"Bob\",\"age\":30},{\"name\":\"Carol\",\"age\":28}]}\n"
+
+[[exercises]]
+id = "jq.6"
+difficulty = "intermediate"
+question = """From `users.json`, print the name of every user whose age is greater than 25, one per line."""
+expected_output = "Bob\nCarol\n"
+hints = [
+  "Use select() to filter elements by a condition",
+  "Try: jq -r '.users[] | select(.age > 25) | .name' users.json",
+]
+solution = "jq -r '.users[] | select(.age > 25) | .name' users.json"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "users.json"
+content = "{\"users\":[{\"name\":\"Alice\",\"age\":22},{\"name\":\"Bob\",\"age\":30},{\"name\":\"Carol\",\"age\":28}]}\n"
+
+[[exercises]]
+id = "jq.7"
+difficulty = "intermediate"
+question = """Extract just the product names from `products.json` into a JSON array."""
+expected_output = """[
+  "Widget",
+  "Gadget",
+  "Doohickey"
+]
+"""
+hints = [
+  "Use map() to transform each element, then wrap in an array",
+  "Try: jq '[.products[].name]' products.json",
+]
+solution = "jq '[.products[].name]' products.json"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "products.json"
+content = "{\"products\":[{\"name\":\"Widget\",\"price\":9.99},{\"name\":\"Gadget\",\"price\":19.99},{\"name\":\"Doohickey\",\"price\":4.99}]}\n"
+
+[[exercises]]
+id = "jq.8"
+difficulty = "advanced"
+question = """Print the keys of `config.json` sorted alphabetically, one per line."""
+expected_output = "debug\nhost\nport\n"
+hints = [
+  "jq's keys filter returns a sorted array of object keys",
+  "Try: jq -r 'keys[]' config.json",
+]
+solution = "jq -r 'keys[]' config.json"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "config.json"
+content = "{\"port\":8080,\"host\":\"localhost\",\"debug\":false}\n"

@@ -1,0 +1,268 @@
+[module]
+name = "git"
+description = "Version control — track changes, branch, stash, and inspect history"
+version = 1
+
+[intro]
+text = """
+## What is git?
+
+`git` is a distributed version control system. It tracks every change made to your files, lets you work on parallel lines of development (branches), and keeps a full history you can always go back to.
+
+## Core Concepts
+
+- **Repository:** a directory tracked by git — contains your files plus a `.git/` metadata directory
+- **Commit:** a saved snapshot of all tracked files at a point in time
+- **Staging area (index):** where you prepare changes before committing them
+- **Branch:** a movable pointer to a commit — lets you work in isolation
+
+## The Basic Workflow
+
+```
+git init            # create a repo in the current directory
+git add file.txt    # stage a file for the next commit
+git commit -m "msg" # save a snapshot with a message
+git log --oneline   # view commit history, one line per commit
+git diff            # show unstaged changes
+git status          # show what is staged, modified, and untracked
+```
+
+## Inspecting and Branching
+
+```
+git diff --cached           # show staged changes (vs last commit)
+git log --format="%s" -1    # print only the subject of the last commit
+git branch feature          # create a branch called feature
+git checkout -b dev         # create and switch to branch dev
+git branch --show-current   # print the current branch name
+git stash                   # shelve uncommitted changes
+git stash list              # list stashed changes
+git rev-list --count HEAD   # count total commits
+```
+"""
+
+[[examples]]
+title = "Initialize a repository"
+description = "Create a new repo in a subdirectory"
+command = "git init -q myproject && echo \"repo ready\""
+output = "repo ready\n"
+
+[[examples]]
+title = "Stage and commit"
+description = "Add a file to the index and save a snapshot"
+command = "git add README.md && git commit -q -m \"initial commit\" && git rev-list --count HEAD"
+output = "1\n"
+
+[[examples]]
+title = "Inspect staged files"
+description = "Show which files are staged before committing"
+command = "git add main.py && git diff --cached --name-only"
+output = "main.py\n"
+
+# ── exercises ──────────────────────────────────────────────────────────────────
+
+[[exercises]]
+id = "git.1"
+difficulty = "beginner"
+question = """Initialize a git repository inside a new directory called `project`.
+Print "yes" if the `.git` directory was created inside it."""
+expected_output = "yes\n"
+hints = [
+  "Use git init with a directory name, then test -d to check the result",
+  "Try: git init -q project && test -d project/.git && echo \"yes\"",
+]
+solution = "git init -q project && test -d project/.git && echo \"yes\""
+match_mode = "exact"
+
+[[exercises]]
+id = "git.2"
+difficulty = "beginner"
+question = """A file `hello.txt` already exists in the working directory.
+Initialize a git repo here, stage `hello.txt`, then show only the staged lines from `git status --short`."""
+expected_output = "A  hello.txt\n"
+hints = [
+  "Staged new files appear as 'A  filename' in git status --short — pipe through grep to isolate them",
+  "Try: git init -q . && git add hello.txt && git status --short | grep '^A'",
+]
+solution = "git init -q . && git add hello.txt && git status --short | grep '^A'"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "hello.txt"
+content = "Hello, World!\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"
+
+[[exercises]]
+id = "git.3"
+difficulty = "beginner"
+question = """Stage `notes.txt` and commit it with the message "add notes".
+Print the total number of commits using git rev-list."""
+expected_output = "1\n"
+hints = [
+  "Use git init, git add, git commit -q, then git rev-list --count HEAD",
+  "Try: git init -q . && git add notes.txt && git commit -q -m \"add notes\" && git rev-list --count HEAD",
+]
+solution = "git init -q . && git add notes.txt && git commit -q -m \"add notes\" && git rev-list --count HEAD"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "notes.txt"
+content = "my notes\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"
+
+[[exercises]]
+id = "git.4"
+difficulty = "beginner"
+question = """Two files `file1.txt` and `file2.txt` exist.
+Make two separate commits — one for each file — then print the total commit count."""
+expected_output = "2\n"
+hints = [
+  "git add one file, commit, then git add the other, commit again",
+  "Try: git init -q . && git add file1.txt && git commit -q -m \"first\" && git add file2.txt && git commit -q -m \"second\" && git rev-list --count HEAD",
+]
+solution = "git init -q . && git add file1.txt && git commit -q -m \"first\" && git add file2.txt && git commit -q -m \"second\" && git rev-list --count HEAD"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "file1.txt"
+content = "content one\n"
+
+[[exercises.fixtures]]
+filename = "file2.txt"
+content = "content two\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"
+
+[[exercises]]
+id = "git.5"
+difficulty = "beginner"
+question = """Stage `app.py` without committing it.
+Print the name of the staged file using `git diff --cached`."""
+expected_output = "app.py\n"
+hints = [
+  "Use git diff --cached --name-only to list staged file names",
+  "Try: git init -q . && git add app.py && git diff --cached --name-only",
+]
+solution = "git init -q . && git add app.py && git diff --cached --name-only"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "app.py"
+content = "print('hello')\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"
+
+[[exercises]]
+id = "git.6"
+difficulty = "intermediate"
+question = """Commit `README.md` on the default branch, then create a branch called `feature`.
+List all branches, one per line, sorted alphabetically."""
+expected_output = "feature\nmain\n"
+hints = [
+  "Use git branch to create the branch, then git branch | tr -d ' *' | sort to list",
+  "Try: git init -q . && git add README.md && git commit -q -m \"init\" && git branch feature && git branch | tr -d ' *' | sort",
+]
+solution = "git init -q . && git add README.md && git commit -q -m \"init\" && git branch feature && git branch | tr -d ' *' | sort"
+match_mode = "sorted"
+
+[[exercises.fixtures]]
+filename = "README.md"
+content = "# Project\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"
+
+[[exercises]]
+id = "git.7"
+difficulty = "intermediate"
+question = """Commit `README.md`, then create and switch to a new branch called `dev`.
+Print the name of the current branch."""
+expected_output = "dev\n"
+hints = [
+  "Use git checkout -b to create and switch in one step, then git branch --show-current",
+  "Try: git init -q . && git add README.md && git commit -q -m \"init\" && git checkout -q -b dev && git branch --show-current",
+]
+solution = "git init -q . && git add README.md && git commit -q -m \"init\" && git checkout -q -b dev && git branch --show-current"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "README.md"
+content = "# Project\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"
+
+[[exercises]]
+id = "git.8"
+difficulty = "intermediate"
+question = """`app.py` contains `print('hello')`. Commit it, then append `# new feature` to the file.
+Show only the added lines from `git diff` (lines starting with `+`, excluding the `+++` header)."""
+expected_output = "+# new feature\n"
+hints = [
+  "Use git diff then pipe through grep to isolate added lines",
+  "Try: git init -q . && git add app.py && git commit -q -m \"init\" && printf \"# new feature\\n\" >> app.py && git diff | grep \"^+\" | grep -v \"^+++\"",
+]
+solution = "git init -q . && git add app.py && git commit -q -m \"init\" && printf \"# new feature\\n\" >> app.py && git diff | grep \"^+\" | grep -v \"^++\""
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "app.py"
+content = "print('hello')\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"
+
+[[exercises]]
+id = "git.9"
+difficulty = "advanced"
+question = """Commit `main.py`, then append "wip" to the file and stash the change.
+Print the number of entries in the stash list."""
+expected_output = "1\n"
+hints = [
+  "Use git stash after modifying the file, then git stash list | wc -l",
+  "Try: git init -q . && git add main.py && git commit -q -m \"init\" && printf \"wip\\n\" >> main.py && git stash -q && git stash list | wc -l | tr -d ' '",
+]
+solution = "git init -q . && git add main.py && git commit -q -m \"init\" && printf \"wip\\n\" >> main.py && git stash -q && git stash list | wc -l | tr -d ' '"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "main.py"
+content = "print('hello')\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"
+
+[[exercises]]
+id = "git.10"
+difficulty = "advanced"
+question = """Commit `auth.py` with the message "feat: add login".
+Print only the commit subject (first line of the message) using a custom git log format."""
+expected_output = "feat: add login\n"
+hints = [
+  "git log supports a --format flag; %s is the subject placeholder",
+  "Try: git init -q . && git add auth.py && git commit -q -m \"feat: add login\" && git log --format=\"%s\" -1",
+]
+solution = "git init -q . && git add auth.py && git commit -q -m \"feat: add login\" && git log --format=\"%s\" -1"
+match_mode = "exact"
+
+[[exercises.fixtures]]
+filename = "auth.py"
+content = "def login(): pass\n"
+
+[[exercises.fixtures]]
+filename = ".gitconfig"
+content = "[user]\n\tname = Dev\n\temail = dev@example.com\n[init]\n\tdefaultBranch = main\n"

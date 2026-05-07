@@ -8,10 +8,10 @@ fn all_bundled_toml_files_deserialize() {
 }
 
 #[test]
-fn twelve_modules_loaded_at_launch() {
-    // more_modules.MODULES.1 — 12 modules total including wc, tar, chmod
+fn fifteen_modules_loaded_at_launch() {
+    // more_modules.MODULES.1 — 15 modules total
     let modules = load_modules();
-    assert_eq!(modules.len(), 12);
+    assert_eq!(modules.len(), 15);
     let names: Vec<&str> = modules.iter().map(|m| m.module.name.as_str()).collect();
     assert!(names.contains(&"grep"));
     assert!(names.contains(&"awk"));
@@ -25,6 +25,9 @@ fn twelve_modules_loaded_at_launch() {
     assert!(names.contains(&"wc"));
     assert!(names.contains(&"tar"));
     assert!(names.contains(&"chmod"));
+    assert!(names.contains(&"git"));
+    assert!(names.contains(&"jq"));
+    assert!(names.contains(&"make"));
 }
 
 #[test]

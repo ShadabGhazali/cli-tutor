@@ -67,8 +67,11 @@ Requires a terminal at least 80×24.
 | `wc` | Count lines, words, and bytes in files | 6 |
 | `tar` | Create, list, and extract archive files | 5 |
 | `chmod` | Change file permissions | 6 |
+| `git` | Version control — init, commit, branch, stash, diff | 10 |
+| `jq` | Query and transform JSON from the command line | 8 |
+| `make` | Automate build steps and tasks with Makefiles | 5 |
 
-**83 exercises** — beginner to advanced. Progress is saved automatically.
+**106 exercises** — beginner to advanced. Progress is saved automatically.
 
 ---
 
