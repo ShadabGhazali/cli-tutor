@@ -1,6 +1,6 @@
 [package]
 name = "cli-tutor"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 description = "Interactive terminal app for learning Unix command-line tools"
 license = "MIT"
