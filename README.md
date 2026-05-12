@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/cli-tutor.svg)](https://crates.io/crates/cli-tutor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Learn Unix command-line tools by typing real commands — not reading about them.
+Learn Unix command-line tools by typing real commands, not reading about them.
 
 Pick a tool, read the intro, try the examples, then solve exercises in a live shell.
 Each command you type is actually executed and checked against the expected output.
@@ -27,10 +27,10 @@ cargo install cli-tutor
 **Pre-built binary (no Rust required)**
 
 1. Go to the [Releases](https://github.com/ShadabGhazali/cli-tutor/releases) page and download the archive for your platform:
-   - `cli-tutor-aarch64-apple-darwin.tar.gz` — macOS Apple Silicon (M1/M2/M3)
-   - `cli-tutor-x86_64-apple-darwin.tar.gz` — macOS Intel
-   - `cli-tutor-x86_64-unknown-linux-musl.tar.gz` — Linux x86_64
-   - `cli-tutor-x86_64-pc-windows-msvc.zip` — Windows x86_64
+   - `cli-tutor-aarch64-apple-darwin.tar.gz`: macOS Apple Silicon (M1/M2/M3)
+   - `cli-tutor-x86_64-apple-darwin.tar.gz`: macOS Intel
+   - `cli-tutor-x86_64-unknown-linux-musl.tar.gz`: Linux x86_64
+   - `cli-tutor-x86_64-pc-windows-msvc.zip`: Windows x86_64
 
 2. Extract and run:
 
@@ -40,13 +40,13 @@ tar xzf cli-tutor-*.tar.gz
 chmod +x cli-tutor
 ./cli-tutor
 
-# macOS — if blocked by Gatekeeper, remove the quarantine flag first
+# macOS: if blocked by Gatekeeper, remove the quarantine flag first
 xattr -d com.apple.quarantine cli-tutor
 ./cli-tutor
 ```
 
 ```powershell
-# Windows — extract the zip, then run in a terminal
+# Windows: extract the zip, then run in a terminal
 .\cli-tutor.exe
 ```
 
@@ -70,7 +70,7 @@ cargo build --release
 ./target/release/cli-tutor
 ```
 
-Requires a terminal at least 80×24.
+Requires a terminal at least 80x24.
 </details>
 
 ---
@@ -79,13 +79,13 @@ Requires a terminal at least 80×24.
 
 Sorted from most-used daily foundations through dev tools and into thematic real-world workflows.
 
-### Foundations — navigate and view
+### Foundations: navigate and view
 
 | Tool | What it does | Exercises |
 |------|-------------|-----------|
 | `ls` | List directory contents, spot hidden files, sort by time or size | 6 |
-| `cat` | Display and concatenate files — the start of every pipeline | 5 |
-| `head` | Preview the first N lines — check CSV headers, sample data | 5 |
+| `cat` | Display and concatenate files; the start of every pipeline | 5 |
+| `head` | Preview the first N lines; check CSV headers and sample data | 5 |
 | `tail` | View the last N lines, skip headers, monitor recent log entries | 6 |
 
 ### Search and filter
@@ -100,19 +100,19 @@ Sorted from most-used daily foundations through dev tools and into thematic real
 | Tool | What it does | Exercises |
 |------|-------------|-----------|
 | `cut` | Extract columns from delimited text | 5 |
-| `sort` | Sort lines — alphabetically, numerically, by field | 6 |
+| `sort` | Sort lines alphabetically, numerically, by field | 6 |
 | `uniq` | Remove or count duplicate adjacent lines | 4 |
 | `wc` | Count lines, words, and bytes | 6 |
 | `tr` | Translate or delete individual characters | 4 |
-| `sed` | Stream editor — substitute, delete, transform lines | 10 |
-| `awk` | Field-based processing language — extract, filter, aggregate | 10 |
+| `sed` | Stream editor: substitute, delete, transform lines | 10 |
+| `awk` | Field-based processing language: extract, filter, aggregate | 10 |
 
 ### Combine and compare
 
 | Tool | What it does | Exercises |
 |------|-------------|-----------|
 | `paste` | Merge lines from multiple files side by side | 4 |
-| `tee` | Fork a pipeline — write to a file AND pass through to stdout | 4 |
+| `tee` | Fork a pipeline: write to a file and pass through to stdout | 4 |
 | `diff` | Compare two files and show what changed | 5 |
 
 ### Archive, permissions, and utilities
@@ -122,26 +122,26 @@ Sorted from most-used daily foundations through dev tools and into thematic real
 | `xargs` | Build and run commands from standard input | 6 |
 | `tar` | Create, list, and extract archive files | 5 |
 | `chmod` | Change file permissions | 6 |
-| `bc` | Arbitrary-precision arithmetic — percentages, averages in scripts | 4 |
+| `bc` | Arbitrary-precision arithmetic for percentages and averages in scripts | 4 |
 
 ### Dev tools
 
 | Tool | What it does | Exercises |
 |------|-------------|-----------|
-| `git` | Version control — init, commit, branch, stash, diff | 10 |
+| `git` | Version control: init, commit, branch, stash, diff | 10 |
 | `jq` | Query and transform JSON from the command line | 8 |
 | `make` | Automate build steps and tasks with Makefiles | 5 |
 
 ### Real-world workflows
 
-These modules teach you to **combine tools in pipelines** to solve complete engineering tasks — not just individual command syntax.
+These modules teach you to **combine tools in pipelines** to solve complete engineering tasks, not just individual command syntax.
 
 | Module | What it covers | Exercises |
 |--------|---------------|-----------|
 | `log-processing` | Analyze Apache/app logs: count requests, find errors, top-N IPs, error rates | 8 |
 | `text-processing` | Transform CSV data, extract fields, calculate stats, process config files | 8 |
 
-**161 exercises** — beginner to advanced. Progress is saved automatically.
+**161 exercises**, beginner to advanced. Progress is saved automatically.
 
 ---
 
@@ -155,10 +155,10 @@ These modules teach you to **combine tools in pipelines** to solve complete engi
 | Key | Action |
 |-----|--------|
 | `↑` `↓` | Switch module |
-| `Tab` | Cycle views: Intro → Examples → Exercise → Free Practice |
+| `Tab` | Cycle views: Intro -> Examples -> Exercise -> Free Practice |
 | `Ctrl+U` `Ctrl+D` | Scroll content |
 | `/` | Fuzzy search modules |
-| `d` | Cycle difficulty filter (All → Beginner → Intermediate → Advanced) |
+| `d` | Cycle difficulty filter (All -> Beginner -> Intermediate -> Advanced) |
 | `P` | Progress summary |
 | `q` | Quit |
 
@@ -237,7 +237,7 @@ skip_completed  = false   # auto-skip already-solved exercises during navigation
 default_module  = "grep"  # open on this module instead of the first in the list
 ```
 
-A missing or corrupt config file is silently ignored — defaults apply.
+A missing or corrupt config file is silently ignored; defaults apply.
 
 ---
 
